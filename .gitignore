@@ -1,0 +1,9 @@
+# Generated files
+bin/
+obj/
+.vs/
+
+# Secrets and local configuration
+.env
+backend/SocialPublisher.API/appsettings.json
+backend/SocialPublisher.API/appsettings.Development.json

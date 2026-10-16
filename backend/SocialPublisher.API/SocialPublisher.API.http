@@ -1,0 +1,6 @@
+@SocialPublisher.API_HostAddress = http://localhost:5293
+
+GET {{SocialPublisher.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

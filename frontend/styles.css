@@ -1,0 +1,454 @@
+body {
+    background-color: #f4f6f9;
+}
+
+.navbar {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-size: 0.95rem;
+    padding: 0.85rem 1.25rem;
+}
+
+.platform-row:last-child {
+    border-bottom: none !important;
+}
+
+.platform-row:hover {
+    background-color: #f8f9fa;
+}
+
+.form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    cursor: pointer;
+}
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+#publishBtn {
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+}
+
+.img-thumbnail {
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 140px;
+}
+
+.badge {
+    font-size: 0.78rem;
+    padding: 0.4em 0.75em;
+}
+
+.list-group-item {
+    border-left: none;
+    border-right: none;
+}
+
+/* ==========================================================================
+   Zoho-style brand setup flow  (used by accounts-ui.js)
+   ========================================================================== */
+:root {
+    --wz-blue: #2f62b5;
+    --wz-blue-dark: #264f93;
+    --wz-line: #e3e6ea;
+    --wz-muted: #6b7280;
+}
+
+.wz-modal .modal-content {
+    border: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
+}
+
+.wz-head {
+    background: #f4f4f5;
+    padding: 20px 28px 0;
+    border-bottom: 1px solid var(--wz-line);
+}
+
+    .wz-head:not(:has(.wz-tabs)) {
+        padding-bottom: 18px;
+    }
+
+.wz-title {
+    font-size: 1.35rem;
+    font-weight: 500;
+    margin: 0;
+    color: #111;
+}
+
+.wz-sub {
+    font-size: .85rem;
+    color: var(--wz-muted);
+    margin-top: 2px;
+}
+
+/* network tabs */
+.wz-tabs {
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+}
+
+.wz-tab {
+    position: relative;
+    border: 0;
+    background: transparent;
+    padding: 8px 14px 10px;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+    .wz-tab:hover:not(.disabled) {
+        background: rgba(0, 0, 0, .04);
+    }
+
+    .wz-tab.active {
+        border-bottom-color: #f59e0b;
+    }
+
+    .wz-tab.disabled {
+        opacity: .35;
+        cursor: not-allowed;
+    }
+
+.wz-tab-icon {
+    display: inline-flex;
+    font-size: 1.35rem;
+}
+
+.wz-tab-check {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #22c55e;
+    color: #fff;
+    font-size: .6rem;
+    display: grid;
+    place-items: center;
+}
+
+/* body */
+.wz-body {
+    padding: 34px 40px 28px;
+    min-height: 250px;
+}
+
+.wz-body-left {
+    min-height: 0;
+    padding: 26px 36px 30px;
+}
+
+.wz-connect p {
+    color: #222;
+    margin-bottom: 18px;
+}
+
+.wz-note {
+    color: var(--wz-muted) !important;
+    font-size: .88rem;
+    margin-top: 26px !important;
+    margin-bottom: 0 !important;
+}
+
+.wz-foot {
+    padding: 14px 28px;
+    border-top: 1px solid var(--wz-line);
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* pill buttons */
+.wz-pill {
+    border: 0;
+    border-radius: 999px;
+    padding: 9px 22px;
+    background: var(--wz-blue);
+    color: #fff;
+    font-weight: 600;
+    font-size: .92rem;
+    cursor: pointer;
+    transition: filter .15s, transform .05s;
+}
+
+    .wz-pill:hover {
+        filter: brightness(.92);
+    }
+
+    .wz-pill:active {
+        transform: translateY(1px);
+    }
+
+.wz-pill-lg {
+    padding: 11px 26px;
+    font-size: .98rem;
+}
+
+/* success panel */
+.wz-success {
+    text-align: center;
+    padding-top: 8px;
+}
+
+.wz-avatar-big {
+    position: relative;
+    width: 78px;
+    height: 78px;
+    margin: 6px auto 10px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: 1px solid var(--wz-line);
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+}
+
+    .wz-avatar-big img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+.wz-avatar-check {
+    position: absolute;
+    right: -10px;
+    top: -4px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #22c55e;
+    color: #fff;
+    font-size: 1.1rem;
+    display: grid;
+    place-items: center;
+    border: 2px solid #fff;
+}
+
+.wz-avatar-name {
+    color: var(--wz-blue-dark);
+    font-weight: 700;
+}
+
+/* "Add a Page to this Brand" */
+.aa-lead {
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.aa-owner {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.aa-owner-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--wz-line);
+    display: grid;
+    place-items: center;
+    font-size: 1.4rem;
+    flex: 0 0 44px;
+}
+
+.aa-owner-name {
+    color: var(--wz-blue-dark);
+    font-weight: 700;
+}
+
+.aa-owner-help {
+    color: #333;
+    font-size: .93rem;
+}
+
+.aa-link {
+    border: 0;
+    background: none;
+    padding: 0;
+    color: var(--wz-blue-dark);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.aa-list {
+    margin-left: 22px;
+    border-left: 4px solid #d9dce1;
+    padding-left: 20px;
+}
+
+.aa-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--wz-line);
+}
+
+    .aa-row:last-child {
+        border-bottom: 0;
+    }
+
+.aa-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    flex: 0 0 44px;
+    border: 1px solid var(--wz-line);
+    background: #fafafa;
+    display: grid;
+    place-items: center;
+    font-size: 1.3rem;
+    overflow: hidden;
+}
+
+    .aa-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.aa-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.aa-name {
+    color: var(--wz-blue-dark);
+    font-weight: 700;
+}
+
+.aa-meta {
+    color: var(--wz-muted);
+    font-size: .88rem;
+}
+
+.aa-add {
+    border: 1.5px solid var(--wz-blue);
+    color: var(--wz-blue-dark);
+    background: #fff;
+    border-radius: 999px;
+    padding: 7px 22px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+    .aa-add:hover:not(:disabled) {
+        background: #eef3fb;
+    }
+
+    .aa-add.done {
+        border-color: #22c55e;
+        color: #15803d;
+        cursor: default;
+    }
+
+    .aa-add:disabled {
+        opacity: .85;
+    }
+
+/* "Add more channels" strip under the account list */
+.wz-add-strip {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: .9rem;
+    color: #333;
+    border-top: 1px solid var(--wz-line);
+}
+
+.wz-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--wz-line);
+    background: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+    .wz-dot:hover:not(.disabled) {
+        background: #f3f4f6;
+    }
+
+    .wz-dot.disabled {
+        opacity: .35;
+        cursor: not-allowed;
+    }
+
+/* Publishing Progress card */
+.wz-progress {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 2000;
+    width: 340px;
+    max-width: calc(100vw - 32px);
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 34px rgba(0, 0, 0, .22);
+    padding: 16px 18px;
+}
+
+.wz-progress-head {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.wz-progress-x {
+    border: 0;
+    background: none;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: #888;
+    cursor: pointer;
+    padding: 0 2px;
+}
+
+.wz-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: .92rem;
+}
+
+.wz-progress-state {
+    width: 20px;
+    display: inline-flex;
+    justify-content: center;
+}
