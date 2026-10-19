@@ -27,7 +27,6 @@ namespace SocialPublisher.API.Models
         public int? ConnectionId { get; set; }
         public SocialConnection? Connection { get; set; }
 
-        [MaxLength(500)]
         public string? AvatarUrl { get; set; }
 
         // Navigation property for related publish records

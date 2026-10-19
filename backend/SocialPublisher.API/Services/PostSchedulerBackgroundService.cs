@@ -82,9 +82,13 @@ namespace SocialPublisher.API.Services
                     continue;
                 }
 
+                // Immediate lock: prevent duplicate execution if interval triggers while publishing
+                post.Status = "Processing";
+                await dbContext.SaveChangesAsync(cancellationToken);
+
                 try
                 {
-                    _logger.LogInformation("Publishing scheduled post ID: {PostId}...", post.Id);
+                    _logger.LogInformation("Publishing scheduled post ID: {PostId} for platforms [{Platforms}]...", post.Id, string.Join(",", platforms));
                     await publishingService.PublishExistingPostAsync(post.Id, platforms, cancellationToken);
                 }
                 catch (Exception ex)

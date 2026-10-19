@@ -45,7 +45,8 @@ namespace SocialPublisher.API.Services
                 Title = request.Title ?? string.Empty,
                 Content = request.Content,
                 Status = "Processing",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                ClientId = request.ClientId
             };
 
             // CHANGED (1/4): link images uploaded earlier via POST /api/social/media (needed for Instagram)
@@ -69,9 +70,19 @@ namespace SocialPublisher.API.Services
             {
                 var platformLower = platform.ToLowerInvariant();
 
-                // Get the account from DB (seeded from appsettings on startup)
-                var account = await _dbContext.SocialAccounts
-                    .FirstOrDefaultAsync(a => a.Platform == platformLower, cancellationToken);
+                // Look for brand-specific connected account first; fall back to global/base account if not found
+                SocialAccount? account = null;
+                if (request.ClientId.HasValue && request.ClientId.Value > 0)
+                {
+                    account = await _dbContext.SocialAccounts
+                        .FirstOrDefaultAsync(a => a.ClientId == request.ClientId.Value && a.Platform == platformLower && a.IsConnected, cancellationToken);
+                }
+
+                if (account == null)
+                {
+                    account = await _dbContext.SocialAccounts
+                        .FirstOrDefaultAsync(a => a.Platform == platformLower, cancellationToken);
+                }
 
                 if (account == null || !account.IsConnected)
                 {
@@ -163,8 +174,20 @@ namespace SocialPublisher.API.Services
             foreach (var platform in platforms)
             {
                 var platformLower = platform.ToLowerInvariant().Trim();
-                var account = await _dbContext.SocialAccounts
-                    .FirstOrDefaultAsync(a => a.Platform == platformLower, cancellationToken);
+
+                // Look for brand-specific connected account first; fall back to global/base account
+                SocialAccount? account = null;
+                if (post.ClientId.HasValue && post.ClientId.Value > 0)
+                {
+                    account = await _dbContext.SocialAccounts
+                        .FirstOrDefaultAsync(a => a.ClientId == post.ClientId.Value && a.Platform == platformLower && a.IsConnected, cancellationToken);
+                }
+
+                if (account == null)
+                {
+                    account = await _dbContext.SocialAccounts
+                        .FirstOrDefaultAsync(a => a.Platform == platformLower, cancellationToken);
+                }
 
                 if (account == null || !account.IsConnected)
                 {

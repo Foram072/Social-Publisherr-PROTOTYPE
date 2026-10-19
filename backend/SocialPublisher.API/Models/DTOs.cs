@@ -10,6 +10,8 @@ namespace SocialPublisher.API.Models
         public List<int> MediaIds { get; set; } = new List<int>();
         public List<string> Platforms { get; set; } = new List<string>();
         public DateTime? ScheduledAt { get; set; }
+        public int? ClientId { get; set; }
+        public bool SubmitForApproval { get; set; } = false;
     }
 
     public class PublishResponse

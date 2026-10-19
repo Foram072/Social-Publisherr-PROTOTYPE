@@ -190,8 +190,9 @@ namespace SocialPublisher.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to bind account {Platform} {Id} to client {ClientId}", request.Platform, request.ExternalAccountId, request.ClientId);
-                return StatusCode(500, new { error = "An error occurred while saving the account." });
+                var detailedError = ex.InnerException?.Message ?? ex.Message;
+                _logger.LogError(ex, "Failed to bind account {Platform} {Id} to client {ClientId}: {Detail}", request.Platform, request.ExternalAccountId, request.ClientId, detailedError);
+                return StatusCode(500, new { error = $"An error occurred while saving the account: {detailedError}" });
             }
         }
 

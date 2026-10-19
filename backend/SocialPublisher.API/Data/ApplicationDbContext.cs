@@ -17,6 +17,8 @@ namespace SocialPublisher.API.Data
         public DbSet<SocialPostPublish> SocialPostPublishes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Organization> Organizations { get; set; }
+        public DbSet<ClientConnectionInvitation> ClientConnectionInvitations { get; set; }
+        public DbSet<SocialPostApproval> SocialPostApprovals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authenticating with Google | Wiseliy Social</title>
+    <title>Signing you in | Wiseliy Social</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
         body {
             display: flex;
             align-items: center;
@@ -15,6 +21,7 @@
             background: #f8fafc;
             color: #1e293b;
         }
+
         .card {
             background: #ffffff;
             border-radius: 12px;
@@ -25,6 +32,7 @@
             width: 90%;
             text-align: center;
         }
+
         .spinner {
             width: 44px;
             height: 44px;
@@ -34,9 +42,31 @@
             animation: spin 0.8s linear infinite;
             margin: 0 auto 20px;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #0f172a; }
-        p { font-size: 14px; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        p {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
         .error-box {
             display: none;
             background: #fef2f2;
@@ -47,6 +77,7 @@
             border: 1px solid #fecaca;
             margin-bottom: 16px;
         }
+
         .btn-retry {
             display: none;
             padding: 10px 20px;
@@ -57,20 +88,23 @@
             font-size: 14px;
             font-weight: 500;
         }
-        .btn-retry:hover { background: #0060ba; }
+
+            .btn-retry:hover {
+                background: #0060ba;
+            }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="spinner" id="spinner"></div>
-        <h2 id="heading">Connecting your Google Account…</h2>
-        <p id="subheading">Verifying authentication credentials and synchronizing your workspace.</p>
+        <h2 id="heading">Signing you in…</h2>
+        <p id="subheading">Verifying your account and preparing your workspace.</p>
         <div class="error-box" id="errorBox"></div>
-        <a href="/login" class="btn-retry" id="retryBtn">Return to Login</a>
+        <a href="/login.html" class="btn-retry" id="retryBtn">Return to Login</a>
     </div>
 
     <script>
-        (async function() {
+        (async function () {
             const hash = window.location.hash.substring(1);
             const params = new URLSearchParams(hash);
             const token = params.get('token');
@@ -85,14 +119,14 @@
             function showError(msg) {
                 spinner.style.display = 'none';
                 heading.textContent = 'Authentication Failed';
-                subheading.textContent = 'We could not complete your Google sign-in.';
+                subheading.textContent = 'We could not complete your sign-in.';
                 errorBox.textContent = msg;
                 errorBox.style.display = 'block';
                 retryBtn.style.display = 'inline-block';
             }
 
             if (error) {
-                showError('Google authentication was cancelled or returned an error: ' + error);
+                showError('Sign-in was cancelled or returned an error: ' + error);
                 return;
             }
 

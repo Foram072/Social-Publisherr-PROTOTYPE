@@ -407,10 +407,15 @@ async function submitCreateWorkspace() {
     }
 
     try {
+        const payload = { name: name, description: desc };
+        if (currentUser && currentUser.organizationId) {
+            payload.organizationId = currentUser.organizationId;
+        }
+
         const res = await fetch(`${API_BASE}/clients`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name, description: desc })
+            body: JSON.stringify(payload)
         });
 
         if (!res.ok) {

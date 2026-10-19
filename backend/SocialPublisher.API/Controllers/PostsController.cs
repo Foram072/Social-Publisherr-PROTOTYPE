@@ -37,6 +37,54 @@ namespace SocialPublisher.API.Controllers
             if (request.Platforms == null || request.Platforms.Count == 0)
                 return BadRequest(new { error = "Please select at least one platform." });
 
+            // If submitted for approval, save with NeedsApproval status
+            if (request.SubmitForApproval)
+            {
+                var approvalPost = new SocialPost
+                {
+                    Title = request.Title ?? string.Empty,
+                    Content = request.Content,
+                    Status = "NeedsApproval",
+                    CreatedAt = System.DateTime.UtcNow,
+                    ScheduledAt = request.ScheduledAt,
+                    ScheduledPlatforms = string.Join(",", request.Platforms),
+                    ClientId = request.ClientId
+                };
+
+                var mediaIds = (request.MediaIds ?? new List<int>()).Distinct().ToList();
+                if (mediaIds.Count > 0)
+                {
+                    var mediaItems = await _context.SocialPostMedia
+                        .Where(m => mediaIds.Contains(m.Id) && m.PostId == null)
+                        .ToListAsync(cancellationToken);
+
+                    foreach (var m in mediaItems)
+                        approvalPost.Media.Add(m);
+                }
+
+                _context.SocialPosts.Add(approvalPost);
+                _context.SocialPostApprovals.Add(new SocialPostApproval
+                {
+                    Post = approvalPost,
+                    Action = "Submitted",
+                    ReviewerName = "Content Creator",
+                    Comments = "Submitted for client/manager approval."
+                });
+
+                await _context.SaveChangesAsync(cancellationToken);
+
+                return Ok(new PublishResponse
+                {
+                    PostId = approvalPost.Id.ToString(),
+                    Status = "NeedsApproval",
+                    Results = request.Platforms.Select(p => new PublishResultDto
+                    {
+                        Platform = p.ToLowerInvariant(),
+                        Status = "Pending Approval"
+                    }).ToList()
+                });
+            }
+
             // If scheduled for a future time, record it as Scheduled without immediate publishing
             if (request.ScheduledAt.HasValue && request.ScheduledAt.Value > System.DateTime.UtcNow)
             {
@@ -47,7 +95,8 @@ namespace SocialPublisher.API.Controllers
                     Status = "Scheduled",
                     CreatedAt = System.DateTime.UtcNow,
                     ScheduledAt = request.ScheduledAt.Value,
-                    ScheduledPlatforms = string.Join(",", request.Platforms)
+                    ScheduledPlatforms = string.Join(",", request.Platforms),
+                    ClientId = request.ClientId
                 };
 
                 var mediaIds = (request.MediaIds ?? new List<int>()).Distinct().ToList();
@@ -81,12 +130,19 @@ namespace SocialPublisher.API.Controllers
         }
 
         /// <summary>
-        /// Returns publishing history for all posts.
+        /// Returns publishing history for posts (optionally filtered by Brand Workspace clientId).
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetPosts(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetPosts([FromQuery] int? clientId, CancellationToken cancellationToken)
         {
-            var posts = await _context.SocialPosts
+            var query = _context.SocialPosts.AsQueryable();
+
+            if (clientId.HasValue && clientId.Value > 0)
+            {
+                query = query.Where(p => p.ClientId == clientId.Value);
+            }
+
+            var posts = await query
                 .Include(p => p.PublishResults)
                     .ThenInclude(r => r.SocialAccount)
                 .OrderByDescending(p => p.CreatedAt)
@@ -98,6 +154,7 @@ namespace SocialPublisher.API.Controllers
                     p.Status,
                     p.CreatedAt,
                     p.ScheduledAt,
+                    p.ClientId,
                     Results = p.PublishResults.Select(r => new
                     {
                         r.Id,
@@ -157,6 +214,135 @@ namespace SocialPublisher.API.Controllers
         {
             var response = await _publishingService.RetryFailedAsync(id, cancellationToken);
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Cancels a scheduled post so it won't be sent by the scheduler.
+        /// </summary>
+        [HttpPost("{id}/cancel")]
+        public async Task<IActionResult> CancelScheduledPost(int id, CancellationToken cancellationToken)
+        {
+            var post = await _context.SocialPosts.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            if (post == null)
+                return NotFound(new { error = $"Post {id} not found." });
+
+            if (post.Status != "Scheduled")
+                return BadRequest(new { error = $"Only scheduled posts can be cancelled. Current status is {post.Status}." });
+
+            post.Status = "Cancelled";
+            await _context.SaveChangesAsync(cancellationToken);
+            return Ok(new { success = true, postId = id, status = "Cancelled" });
+        }
+
+        /// <summary>
+        /// Manually triggers immediate publishing of a scheduled post.
+        /// </summary>
+        [HttpPost("{id}/publish-now")]
+        public async Task<ActionResult<PublishResponse>> PublishScheduledNow(int id, CancellationToken cancellationToken)
+        {
+            var post = await _context.SocialPosts.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            if (post == null)
+                return NotFound(new { error = $"Post {id} not found." });
+
+            if (post.Status != "Scheduled")
+                return BadRequest(new { error = $"Only scheduled posts can be published immediately via this endpoint." });
+
+            var platforms = (post.ScheduledPlatforms ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
+
+            if (platforms.Count == 0)
+                return BadRequest(new { error = "No platforms specified for this post." });
+
+            var response = await _publishingService.PublishExistingPostAsync(post.Id, platforms, cancellationToken);
+            return Ok(response);
+        }
+
+        public class ApprovalActionRequest
+        {
+            public string? ReviewerName { get; set; }
+            public string? Comments { get; set; }
+        }
+
+        /// <summary>
+        /// Approves a post in NeedsApproval status.
+        /// If the post has a future ScheduledAt date, it changes to Scheduled.
+        /// If it has no schedule or is scheduled for now/past, it publishes immediately.
+        /// </summary>
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> ApprovePost(
+            int id, 
+            [FromBody] ApprovalActionRequest? req, 
+            CancellationToken cancellationToken)
+        {
+            var post = await _context.SocialPosts.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            if (post == null)
+                return NotFound(new { error = $"Post {id} not found." });
+
+            if (post.Status != "NeedsApproval")
+                return BadRequest(new { error = $"Only posts in 'NeedsApproval' status can be approved. Current status is {post.Status}." });
+
+            _context.SocialPostApprovals.Add(new SocialPostApproval
+            {
+                PostId = post.Id,
+                Action = "Approved",
+                ReviewerName = req?.ReviewerName ?? "Client Reviewer",
+                Comments = req?.Comments ?? "Approved for release."
+            });
+
+            // If scheduled in the future, set to Scheduled so scheduler picks it up
+            if (post.ScheduledAt.HasValue && post.ScheduledAt.Value > System.DateTime.UtcNow)
+            {
+                post.Status = "Scheduled";
+                await _context.SaveChangesAsync(cancellationToken);
+                return Ok(new { success = true, postId = id, status = "Scheduled", message = "Post approved and queued for scheduled publishing." });
+            }
+
+            // Otherwise, publish immediately to platforms
+            post.Status = "Approved";
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var platforms = (post.ScheduledPlatforms ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
+
+            if (platforms.Count > 0)
+            {
+                var pubResult = await _publishingService.PublishExistingPostAsync(post.Id, platforms, cancellationToken);
+                return Ok(new { success = true, postId = id, status = post.Status, result = pubResult });
+            }
+
+            return Ok(new { success = true, postId = id, status = "Approved" });
+        }
+
+        /// <summary>
+        /// Rejects a post in NeedsApproval status.
+        /// </summary>
+        [HttpPost("{id}/reject")]
+        public async Task<IActionResult> RejectPost(
+            int id, 
+            [FromBody] ApprovalActionRequest? req, 
+            CancellationToken cancellationToken)
+        {
+            var post = await _context.SocialPosts.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            if (post == null)
+                return NotFound(new { error = $"Post {id} not found." });
+
+            if (post.Status != "NeedsApproval")
+                return BadRequest(new { error = $"Only posts in 'NeedsApproval' status can be rejected. Current status is {post.Status}." });
+
+            post.Status = "Rejected";
+
+            _context.SocialPostApprovals.Add(new SocialPostApproval
+            {
+                PostId = post.Id,
+                Action = "Rejected",
+                ReviewerName = req?.ReviewerName ?? "Client Reviewer",
+                Comments = req?.Comments ?? "Rejected by reviewer."
+            });
+
+            await _context.SaveChangesAsync(cancellationToken);
+            return Ok(new { success = true, postId = id, status = "Rejected", comments = req?.Comments });
         }
     }
 }

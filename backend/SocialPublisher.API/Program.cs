@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 var cfg = builder.Configuration;
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 // JWT + Google OAuth Authentication configuration
 builder.Services
@@ -55,6 +60,12 @@ builder.Services
         o.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         o.Scope.Add("email");
         o.Scope.Add("profile");
+        // Always show Google's "Choose an account" screen (fresh start after logout)
+        o.Events.OnRedirectToAuthorizationEndpoint = ctx =>
+        {
+            ctx.Response.Redirect(QueryHelpers.AddQueryString(ctx.RedirectUri, "prompt", "select_account"));
+            return Task.CompletedTask;
+        };
     })
     .AddFacebook(o =>
     {
@@ -66,6 +77,12 @@ builder.Services
         o.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         o.Scope.Add("email");
         o.Scope.Add("public_profile");
+        // Always ask Facebook to confirm / re-enter the account (fresh start after logout)
+        o.Events.OnRedirectToAuthorizationEndpoint = ctx =>
+        {
+            ctx.Response.Redirect(QueryHelpers.AddQueryString(ctx.RedirectUri, "auth_type", "reauthenticate"));
+            return Task.CompletedTask;
+        };
     })
     .AddOAuth("LinkedIn", o =>
     {
@@ -150,6 +167,12 @@ using (var scope = app.Services.CreateScope())
     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
     db.Database.Migrate();
+
+    try
+    {
+        db.Database.ExecuteSqlRaw("ALTER TABLE \"SocialAccounts\" ALTER COLUMN \"AvatarUrl\" TYPE text;");
+    }
+    catch { /* Ignore if already altered */ }
 
     // Seed default client workspace if none exists (for multi-tenant support)
     var defaultClient = db.SocialClients.FirstOrDefault();

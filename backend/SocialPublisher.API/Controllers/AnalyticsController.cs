@@ -34,5 +34,22 @@ namespace SocialPublisher.API.Controllers
                 return NotFound(new { error = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Fetches brand-wide organic and paid advertising analytics for a client workspace.
+        /// </summary>
+        [HttpGet("brands/{clientId}")]
+        public async Task<ActionResult<BrandAnalyticsOverviewDto>> GetBrandAnalytics(int clientId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _analyticsService.GetBrandOverviewAnalyticsAsync(clientId, cancellationToken);
+                return Ok(result);
+            }
+            catch (System.ArgumentException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
     }
 }

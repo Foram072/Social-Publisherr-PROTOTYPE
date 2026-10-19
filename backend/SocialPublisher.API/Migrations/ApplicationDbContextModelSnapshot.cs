@@ -22,6 +22,56 @@ namespace SocialPublisher.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("SocialPublisher.API.Models.ClientConnectionInvitation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RecipientEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("RecipientName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("ClientConnectionInvitations");
+                });
+
             modelBuilder.Entity("SocialPublisher.API.Models.Organization", b =>
                 {
                     b.Property<int>("Id")
@@ -68,8 +118,7 @@ namespace SocialPublisher.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("AvatarUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("ClientId")
                         .HasColumnType("integer");
@@ -242,6 +291,38 @@ namespace SocialPublisher.API.Migrations
                     b.ToTable("SocialPosts");
                 });
 
+            modelBuilder.Entity("SocialPublisher.API.Models.SocialPostApproval", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReviewerName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("SocialPostApprovals");
+                });
+
             modelBuilder.Entity("SocialPublisher.API.Models.SocialPostMedia", b =>
                 {
                     b.Property<int>("Id")
@@ -356,6 +437,17 @@ namespace SocialPublisher.API.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SocialPublisher.API.Models.ClientConnectionInvitation", b =>
+                {
+                    b.HasOne("SocialPublisher.API.Models.SocialClient", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("SocialPublisher.API.Models.SocialAccount", b =>
                 {
                     b.HasOne("SocialPublisher.API.Models.SocialClient", "Client")
@@ -401,6 +493,17 @@ namespace SocialPublisher.API.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("SocialPublisher.API.Models.SocialPostApproval", b =>
+                {
+                    b.HasOne("SocialPublisher.API.Models.SocialPost", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("SocialPublisher.API.Models.SocialPostMedia", b =>

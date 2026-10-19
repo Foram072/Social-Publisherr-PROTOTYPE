@@ -36,6 +36,14 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-warning" onclick="openInviteClientModal()">
+                <i class="bi bi-person-plus-fill"></i>
+                Invite Client
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="showBrandAnalytics()">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                Analytics & Ads
+            </button>
             <button class="btn btn-sm btn-outline-light" onclick="showHistory()">
                 <i class="bi bi-clock-history"></i>
                 Publishing History
@@ -142,7 +150,7 @@
                     </div>
                 </div>
 
-                <!-- SCHEDULING OPTIONS -->
+                <!-- SCHEDULING & APPROVAL OPTIONS -->
                 <div class="card shadow-sm mb-3">
                     <div class="card-body py-2 px-3">
                         <div class="form-check form-switch mb-2">
@@ -151,10 +159,24 @@
                                 <i class="bi bi-clock"></i> Schedule for Later
                             </label>
                         </div>
-                        <div id="scheduleTimeGroup" class="d-none">
+                        <div id="scheduleTimeGroup" class="d-none mb-3">
                             <label class="form-label small text-muted mb-1">Pick Publish Date & Time:</label>
                             <input type="datetime-local" class="form-control form-control-sm" id="scheduledAtInput">
                             <div class="form-text small">Post will automatically publish at this scheduled time.</div>
+                        </div>
+
+                        <hr class="my-2">
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="approvalToggle" onchange="toggleApprovalOptions()">
+                            <label class="form-check-label fw-semibold text-warning-emphasis" for="approvalToggle">
+                                <i class="bi bi-check2-circle"></i> Submit for Client / Manager Approval
+                            </label>
+                        </div>
+                        <div id="approvalNoteGroup" class="d-none mt-2">
+                            <div class="alert alert-warning py-1 px-2 mb-0 small">
+                                <i class="bi bi-info-circle-fill me-1"></i> Post will not publish until an agency manager or client reviews and approves it.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -222,6 +244,27 @@
             </div>
         </div>
 
+        <!-- BRAND & PAID ADS ANALYTICS MODAL (CEO INTEGRATION GUIDE) -->
+        <div class="modal fade" id="brandAnalyticsModal" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white border-secondary">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-bar-chart-line-fill text-info fs-5"></i>
+                            <h5 class="modal-title fw-bold mb-0" id="brandAnalyticsTitle">Brand Analytics & Paid Ads Insights</h5>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4 bg-light" id="brandAnalyticsContainer">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="text-muted mt-2">Loading organic & paid performance metrics...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- COMMENTS & ENGAGEMENT MODAL -->
         <div class="modal fade" id="commentsModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -236,6 +279,54 @@
                         <div class="text-center py-4">
                             <div class="spinner-border text-primary"></div>
                             <p class="text-muted mt-2">Loading comments...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVITE CLIENT / SEND CONNECTION LINK MODAL -->
+        <div class="modal fade" id="inviteClientModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title fw-bold">
+                            <i class="bi bi-send-check-fill me-1"></i> Send Connection Link to Client
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="text-muted small">
+                            Clients don't need to share passwords with your agency. Send them this secure authorization link, and their connected accounts will automatically be mapped to <strong id="inviteBrandName">this Brand Workspace</strong>.
+                        </p>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Client / Contact Name</label>
+                            <input type="text" class="form-control" id="inviteClientContactName" placeholder="e.g. Sarah Jenkins">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Client Email (Optional)</label>
+                            <input type="email" class="form-control" id="inviteClientEmail" placeholder="client@company.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Note / Message</label>
+                            <textarea class="form-control" id="inviteClientMsg" rows="2" placeholder="Hi! Please click below to authorize our agency to manage your social channels."></textarea>
+                        </div>
+                        <button class="btn btn-warning w-100 fw-bold" onclick="generateClientInviteLink()">
+                            <i class="bi bi-link-45deg"></i> Generate Secure Connection Link
+                        </button>
+
+                        <div id="inviteResultArea" class="d-none mt-3 pt-3 border-top">
+                            <label class="form-label small fw-bold text-success"><i class="bi bi-check-circle-fill me-1"></i> Link Ready to Send:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control font-monospace small" id="generatedInviteUrl" readonly>
+                                <button class="btn btn-outline-secondary" onclick="copyInviteLink()">
+                                    <i class="bi bi-clipboard"></i> Copy
+                                </button>
+                                <a id="openInviteLinkBtn" href="#" target="_blank" class="btn btn-primary">
+                                    <i class="bi bi-box-arrow-up-right"></i> Open
+                                </a>
+                            </div>
+                            <small class="text-muted d-block mt-1">This link is valid for 7 days.</small>
                         </div>
                     </div>
                 </div>
@@ -1129,9 +1220,11 @@
                     scheduledAtIso = scheduledDate.toISOString();
                 }
 
+                const isApproval = document.getElementById("approvalToggle")?.checked;
+
                 btn.innerHTML = `
                         <span class="spinner-border spinner-border-sm me-2"></span>
-                        ${isScheduled ? "Scheduling..." : "Publishing..."}
+                        ${isApproval ? "Submitting for approval..." : (isScheduled ? "Scheduling..." : "Publishing...")}
                     `;
 
 
@@ -1147,7 +1240,11 @@
                     // This now contains ALL uploaded media IDs.
                     mediaIds: mediaIds,
 
-                    scheduledAt: scheduledAtIso
+                    scheduledAt: scheduledAtIso,
+
+                    clientId: (typeof currentClientId !== "undefined" && currentClientId) ? currentClientId : null,
+
+                    submitForApproval: !!isApproval
                 };
 
 
@@ -1502,6 +1599,12 @@
                                    <i class="bi bi-clock-fill"></i> Scheduled
                                </span>`
 
+                        : overallStatus === "NeedsApproval"
+
+                            ? `<span class="badge bg-warning text-dark">
+                                   <i class="bi bi-hourglass-split"></i> Awaiting Approval
+                               </span>`
+
                         : overallStatus === "PartiallyPublished"
 
                             ? `<span class="badge bg-warning text-dark">
@@ -1568,6 +1671,9 @@
                     const isScheduled =
                         r.status === "Scheduled" || overallStatus === "Scheduled";
 
+                    const isPendingApproval =
+                        r.status === "Pending Approval" || overallStatus === "NeedsApproval";
+
 
                     let actions = "";
 
@@ -1598,7 +1704,7 @@
                     }
 
 
-                    if (!isPublished && !isScheduled) {
+                    if (!isPublished && !isScheduled && !isPendingApproval) {
 
                         actions += `
 
@@ -1654,7 +1760,9 @@
                             ? "text-success"
                             : isScheduled
                                 ? "text-primary"
-                                : "text-danger"
+                                : isPendingApproval
+                                    ? "text-warning-emphasis"
+                                    : "text-danger"
                         }">
 
                                             <i
@@ -1662,7 +1770,9 @@
                             ? "bi-check-circle-fill"
                             : isScheduled
                                 ? "bi-clock-fill"
-                                : "bi-x-circle-fill"
+                                : isPendingApproval
+                                    ? "bi-hourglass-split"
+                                    : "bi-x-circle-fill"
                         }">
                                             </i>
 
@@ -1670,10 +1780,12 @@
                             ? "Post published successfully"
                             : isScheduled
                                 ? "Scheduled for automatic publishing"
-                                : (
-                                    r.error ||
-                                    "Failed"
-                                )
+                                : isPendingApproval
+                                    ? "Submitted for client/manager approval"
+                                    : (
+                                        r.error ||
+                                        "Failed"
+                                    )
                         }
 
                                         </div>
@@ -1692,7 +1804,9 @@
                             ? "bg-success"
                             : isScheduled
                                 ? "bg-info text-dark"
-                                : "bg-danger"
+                                : isPendingApproval
+                                    ? "bg-warning text-dark"
+                                    : "bg-danger"
                         }">
 
                                         ${r.status}
@@ -1834,9 +1948,13 @@
 
             try {
 
+                const historyUrl = (typeof currentClientId !== "undefined" && currentClientId)
+                    ? `${API_BASE}/posts?clientId=${currentClientId}`
+                    : `${API_BASE}/posts`;
+
                 const res =
                     await fetch(
-                        `${API_BASE}/posts`
+                        historyUrl
                     );
 
 
@@ -2112,6 +2230,22 @@
                                                 <i class="bi bi-chat-dots"></i> Comments
                                             </button>
                                         ` : ''}
+                                        ${p.status === "Scheduled" ? `
+                                            <button class="btn btn-sm btn-success" title="Publish this post right now" onclick="publishScheduledNow(${p.id}, this)">
+                                                <i class="bi bi-send-fill"></i> Publish Now
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" title="Cancel this scheduled post" onclick="cancelScheduledPost(${p.id}, this)">
+                                                <i class="bi bi-x-circle"></i> Cancel
+                                            </button>
+                                        ` : ''}
+                                        ${p.status === "NeedsApproval" ? `
+                                            <button class="btn btn-sm btn-success fw-bold" title="Approve and Release Post" onclick="approvePostFromHistory(${p.id}, this)">
+                                                <i class="bi bi-check-lg"></i> Approve
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" title="Reject Post" onclick="rejectPostFromHistory(${p.id}, this)">
+                                                <i class="bi bi-x-lg"></i> Reject
+                                            </button>
+                                        ` : ''}
                                         ${retryBtn}
                                     </div>
                                 </td>
@@ -2330,6 +2464,92 @@
                         <i class="bi bi-arrow-clockwise"></i>
                         Retry Failed
                     `;
+            }
+        }
+
+        async function cancelScheduledPost(postId, btn) {
+            if (!confirm("Are you sure you want to cancel this scheduled post?")) return;
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Cancelling...`;
+
+            try {
+                const res = await fetch(`${API_BASE}/posts/${postId}/cancel`, { method: "POST" });
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || "Failed to cancel post.");
+                alert("Scheduled post has been cancelled.");
+                showHistory(true);
+            } catch (err) {
+                alert(err.message || "Failed to cancel post.");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
+            }
+        }
+
+        async function publishScheduledNow(postId, btn) {
+            if (!confirm("Publish this scheduled post immediately to all selected platforms?")) return;
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Publishing...`;
+
+            try {
+                const res = await fetch(`${API_BASE}/posts/${postId}/publish-now`, { method: "POST" });
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || "Failed to publish post.");
+                alert(`Post publishing finished with status: ${result.status}`);
+                showHistory(true);
+            } catch (err) {
+                alert(err.message || "Failed to publish post.");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-send-fill"></i> Publish Now`;
+            }
+        }
+
+        async function approvePostFromHistory(postId, btn) {
+            const comments = prompt("Enter approval note or comment (optional):", "Approved for release.");
+            if (comments === null) return; // User cancelled prompt
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Approving...`;
+
+            try {
+                const res = await fetch(`${API_BASE}/posts/${postId}/approve`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ reviewerName: "Client / Agency Manager", comments: comments })
+                });
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || "Failed to approve post.");
+                alert(result.message || `Post approved! Current status: ${result.status}`);
+                showHistory(true);
+            } catch (err) {
+                alert(err.message || "Failed to approve post.");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-check-lg"></i> Approve`;
+            }
+        }
+
+        async function rejectPostFromHistory(postId, btn) {
+            const reason = prompt("Enter reason for rejection:", "Changes requested before publishing.");
+            if (reason === null) return; // User cancelled prompt
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Rejecting...`;
+
+            try {
+                const res = await fetch(`${API_BASE}/posts/${postId}/reject`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ reviewerName: "Client / Agency Manager", comments: reason })
+                });
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || "Failed to reject post.");
+                alert("Post has been marked as Rejected.");
+                showHistory(true);
+            } catch (err) {
+                alert(err.message || "Failed to reject post.");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-x-lg"></i> Reject`;
             }
         }
 
@@ -2616,6 +2836,349 @@
             } finally {
                 if (input) input.disabled = false;
             }
+        }
+        async function showBrandAnalytics() {
+            if (!currentClientId) {
+                alert("Please select a brand/client first from the top-left dropdown.");
+                return;
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById("brandAnalyticsModal"));
+            const container = document.getElementById("brandAnalyticsContainer");
+            const titleEl = document.getElementById("brandAnalyticsTitle");
+            
+            let brandName = "Selected Brand";
+            if (typeof currentClientList !== "undefined" && Array.isArray(currentClientList)) {
+                const activeBrand = currentClientList.find(c => c.id === currentClientId);
+                if (activeBrand) brandName = activeBrand.name || activeBrand.clientName || brandName;
+            } else {
+                const sel = document.getElementById("clientWorkspaceSelect");
+                if (sel && sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]) {
+                    brandName = sel.options[sel.selectedIndex].text.split("(")[0].trim();
+                }
+            }
+            titleEl.innerHTML = `<i class="bi bi-bar-chart-line-fill text-info fs-5 me-2"></i> ${escapeHtml(brandName)} — Organic & Paid Performance`;
+
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted mt-2">Loading organic & paid advertising metrics...</p>
+                </div>
+            `;
+            modal.show();
+
+            try {
+                const res = await fetch(`${API_ORIGIN}/api/social/analytics/brands/${currentClientId}`);
+                if (!res.ok) {
+                    throw new Error(`Failed to load analytics: HTTP ${res.status}`);
+                }
+                const data = await res.json();
+                renderBrandAnalytics(data);
+            } catch (err) {
+                container.innerHTML = `
+                    <div class="alert alert-danger p-3 my-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Unable to load analytics: ${escapeHtml(err.message)}
+                    </div>
+                `;
+            }
+        }
+
+        function renderBrandAnalytics(data) {
+            const container = document.getElementById("brandAnalyticsContainer");
+            if (!data) {
+                container.innerHTML = `<p class="text-muted">No analytics data available.</p>`;
+                return;
+            }
+
+            // Platform summary cards
+            let platformsHtml = "";
+            (data.platforms || []).forEach(p => {
+                const icon = PLATFORM_ICONS[p.platform] || "bi-globe";
+                const color = PLATFORM_COLORS[p.platform] || "#4f46e5";
+                const badge = p.isConnected 
+                    ? `<span class="badge bg-success-subtle text-success border border-success-subtle">Connected</span>` 
+                    : `<span class="badge bg-secondary-subtle text-muted border border-secondary-subtle">Not Connected</span>`;
+
+                platformsHtml += `
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid ${color} !important;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi ${icon} fs-4" style="color: ${color}"></i>
+                                        <h6 class="mb-0 fw-bold text-capitalize">${escapeHtml(p.platform)}</h6>
+                                    </div>
+                                    ${badge}
+                                </div>
+                                <div class="text-truncate text-muted small mb-3">
+                                    ${escapeHtml(p.accountName || "No account linked")}
+                                </div>
+                                <div class="row g-2 text-center">
+                                    <div class="col-4 bg-light p-2 rounded">
+                                        <div class="fw-bold text-dark">${p.likes || 0}</div>
+                                        <div class="text-muted" style="font-size: 11px;">Likes</div>
+                                    </div>
+                                    <div class="col-4 bg-light p-2 rounded">
+                                        <div class="fw-bold text-dark">${p.commentsCount || 0}</div>
+                                        <div class="text-muted" style="font-size: 11px;">Comments</div>
+                                    </div>
+                                    <div class="col-4 bg-light p-2 rounded">
+                                        <div class="fw-bold text-dark">${p.shares || 0}</div>
+                                        <div class="text-muted" style="font-size: 11px;">Shares</div>
+                                    </div>
+                                    <div class="col-6 bg-light p-2 rounded mt-2">
+                                        <div class="fw-bold text-primary">${p.impressions || 0}</div>
+                                        <div class="text-muted" style="font-size: 11px;">Impressions</div>
+                                    </div>
+                                    <div class="col-6 bg-light p-2 rounded mt-2">
+                                        <div class="fw-bold text-success">${p.reach || 0}</div>
+                                        <div class="text-muted" style="font-size: 11px;">Reach</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Paid Ads rows
+            let adsHtml = "";
+            if (data.paidAdCampaigns && data.paidAdCampaigns.length > 0) {
+                data.paidAdCampaigns.forEach(ad => {
+                    const icon = PLATFORM_ICONS[ad.platform] || "bi-globe";
+                    const color = PLATFORM_COLORS[ad.platform] || "#4f46e5";
+                    const statusClass = ad.status.toLowerCase() === "active" ? "bg-success" : "bg-secondary";
+
+                    adsHtml += `
+                        <tr>
+                            <td class="fw-semibold">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi ${icon}" style="color: ${color}"></i>
+                                    <span>${escapeHtml(ad.campaignName)}</span>
+                                </div>
+                            </td>
+                            <td><span class="badge ${statusClass}">${escapeHtml(ad.status)}</span></td>
+                            <td class="fw-bold text-dark">$${Number(ad.spend || 0).toFixed(2)}</td>
+                            <td>${Number(ad.impressions || 0).toLocaleString()}</td>
+                            <td>${Number(ad.clicks || 0).toLocaleString()}</td>
+                            <td>${Number(ad.ctr || 0).toFixed(2)}%</td>
+                            <td>$${Number(ad.cpc || 0).toFixed(2)}</td>
+                            <td><span class="badge bg-primary-subtle text-primary border border-primary-subtle">${ad.leads || 0}</span></td>
+                            <td>${ad.conversions || 0}</td>
+                            <td class="fw-bold text-success">${Number(ad.roas || 0).toFixed(2)}x</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                adsHtml = `
+                    <tr>
+                        <td colspan="10" class="text-center py-4 text-muted">
+                            <i class="bi bi- megaphone fs-3 d-block mb-1 text-secondary"></i>
+                            No paid advertising campaigns connected for this brand yet.
+                        </td>
+                    </tr>
+                `;
+            }
+
+            container.innerHTML = `
+                <!-- EXECUTIVE METRICS -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm p-3 bg-white">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-muted small fw-semibold">TOTAL IMPRESSIONS</div>
+                                    <div class="fs-4 fw-bold text-primary mt-1">${Number(data.totalImpressions || 0).toLocaleString()}</div>
+                                </div>
+                                <div class="bg-primary-subtle text-primary p-2 rounded-3">
+                                    <i class="bi bi-eye-fill fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm p-3 bg-white">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-muted small fw-semibold">TOTAL REACH</div>
+                                    <div class="fs-4 fw-bold text-success mt-1">${Number(data.totalReach || 0).toLocaleString()}</div>
+                                </div>
+                                <div class="bg-success-subtle text-success p-2 rounded-3">
+                                    <i class="bi bi-people-fill fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm p-3 bg-white">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-muted small fw-semibold">TOTAL ENGAGEMENT</div>
+                                    <div class="fs-4 fw-bold text-warning-emphasis mt-1">${Number(data.totalEngagement || 0).toLocaleString()}</div>
+                                </div>
+                                <div class="bg-warning-subtle text-warning-emphasis p-2 rounded-3">
+                                    <i class="bi bi-heart-pulse-fill fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm p-3 bg-white">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-muted small fw-semibold">PUBLISHED POSTS</div>
+                                    <div class="fs-4 fw-bold text-info-emphasis mt-1">${data.publishedPosts || 0}</div>
+                                </div>
+                                <div class="bg-info-subtle text-info-emphasis p-2 rounded-3">
+                                    <i class="bi bi-send-check-fill fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLATFORM BREAKDOWN -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-3">
+                        <i class="bi bi-diagram-3-fill text-primary me-2"></i>
+                        Core Social Networks (Facebook, Instagram, LinkedIn)
+                    </h6>
+                    <div class="row g-3">
+                        ${platformsHtml}
+                    </div>
+                </div>
+
+                <!-- PAID ADVERTISING CAMPAIGNS -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold text-dark mb-0">
+                            <i class="bi bi-currency-dollar text-success me-2"></i>
+                            Paid Advertising Insights (Meta & Google Ads)
+                        </h6>
+                        <span class="badge bg-secondary-subtle text-secondary border">Read-Only Campaign Sync</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light small text-uppercase text-muted">
+                                <tr>
+                                    <th>Campaign</th>
+                                    <th>Status</th>
+                                    <th>Spend</th>
+                                    <th>Impressions</th>
+                                    <th>Clicks</th>
+                                    <th>CTR</th>
+                                    <th>CPC</th>
+                                    <th>Leads</th>
+                                    <th>Conversions</th>
+                                    <th>ROAS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${adsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // APPROVAL & INVITATION WORKFLOW HELPERS
+        // ============================================================
+        function toggleApprovalOptions() {
+            const isApproval = document.getElementById("approvalToggle")?.checked;
+            const noteGroup = document.getElementById("approvalNoteGroup");
+            const publishBtn = document.getElementById("publishBtn");
+            const publishBtnText = document.getElementById("publishBtnText");
+
+            if (isApproval) {
+                noteGroup?.classList.remove("d-none");
+                if (publishBtnText) publishBtnText.innerText = "Submit for Approval";
+                publishBtn?.classList.remove("btn-success");
+                publishBtn?.classList.add("btn-warning");
+            } else {
+                noteGroup?.classList.add("d-none");
+                const isScheduled = document.getElementById("scheduleToggle")?.checked;
+                if (publishBtnText) publishBtnText.innerText = isScheduled ? "Schedule Post" : "Publish Now";
+                publishBtn?.classList.remove("btn-warning");
+                publishBtn?.classList.add("btn-success");
+            }
+        }
+
+        function openInviteClientModal() {
+            if (!currentClientId) {
+                alert("Please select a brand/client workspace first from the top-left dropdown.");
+                return;
+            }
+
+            let brandName = "Selected Brand";
+            if (typeof currentClientList !== "undefined" && Array.isArray(currentClientList)) {
+                const activeBrand = currentClientList.find(c => c.id === currentClientId);
+                if (activeBrand) brandName = activeBrand.name || activeBrand.clientName || brandName;
+            } else {
+                const sel = document.getElementById("clientWorkspaceSelect");
+                if (sel && sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]) {
+                    brandName = sel.options[sel.selectedIndex].text.split("(")[0].trim();
+                }
+            }
+
+            const labelEl = document.getElementById("inviteBrandName");
+            if (labelEl) labelEl.innerText = brandName;
+
+            // Hide previous results
+            document.getElementById("inviteResultArea")?.classList.add("d-none");
+
+            const modal = new bootstrap.Modal(document.getElementById("inviteClientModal"));
+            modal.show();
+        }
+
+        async function generateClientInviteLink() {
+            if (!currentClientId) {
+                alert("No brand selected.");
+                return;
+            }
+
+            const contactName = document.getElementById("inviteClientContactName")?.value?.trim();
+            const email = document.getElementById("inviteClientEmail")?.value?.trim();
+            const msg = document.getElementById("inviteClientMsg")?.value?.trim();
+
+            try {
+                const res = await fetch(`${API_BASE}/invitations`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        clientId: currentClientId,
+                        recipientName: contactName,
+                        recipientEmail: email,
+                        message: msg
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed to generate connection link.");
+
+                const inputUrl = document.getElementById("generatedInviteUrl");
+                const openBtn = document.getElementById("openInviteLinkBtn");
+                if (inputUrl) inputUrl.value = data.connectionUrl;
+                if (openBtn) openBtn.href = data.connectionUrl;
+
+                document.getElementById("inviteResultArea")?.classList.remove("d-none");
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        }
+
+        function copyInviteLink() {
+            const input = document.getElementById("generatedInviteUrl");
+            if (!input || !input.value) return;
+            navigator.clipboard.writeText(input.value).then(() => {
+                alert("Connection link copied to clipboard!");
+            }).catch(() => {
+                input.select();
+                document.execCommand("copy");
+                alert("Connection link copied!");
+            });
         }
     </script>
 

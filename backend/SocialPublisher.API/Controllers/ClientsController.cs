@@ -90,6 +90,7 @@ namespace SocialPublisher.API.Controllers
             public string Name { get; set; } = string.Empty;
             public string? Description { get; set; }
             public string? TimeZone { get; set; }
+            public int? OrganizationId { get; set; }
         }
 
         /// <summary>
@@ -101,11 +102,20 @@ namespace SocialPublisher.API.Controllers
             if (string.IsNullOrWhiteSpace(request.Name))
                 return BadRequest(new { error = "Client workspace name is required." });
 
+            int? orgId = request.OrganizationId;
+            if (!orgId.HasValue)
+            {
+                // Fall back to first organization if available
+                var defaultOrg = await _context.Organizations.FirstOrDefaultAsync();
+                orgId = defaultOrg?.Id;
+            }
+
             var client = new SocialClient
             {
                 Name = request.Name.Trim(),
                 Description = request.Description?.Trim(),
                 TimeZone = string.IsNullOrWhiteSpace(request.TimeZone) ? "UTC" : request.TimeZone.Trim(),
+                OrganizationId = orgId,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
@@ -113,9 +123,18 @@ namespace SocialPublisher.API.Controllers
             _context.SocialClients.Add(client);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Created new social client workspace '{Name}' (ID {Id})", client.Name, client.Id);
+            _logger.LogInformation("Created new social client workspace '{Name}' (ID {Id}, OrgId: {OrgId})", client.Name, client.Id, client.OrganizationId);
 
-            return CreatedAtAction(nameof(GetClient), new { id = client.Id }, client);
+            return CreatedAtAction(nameof(GetClient), new { id = client.Id }, new
+            {
+                client.Id,
+                client.Name,
+                client.Description,
+                client.TimeZone,
+                client.OrganizationId,
+                client.IsActive,
+                client.CreatedAt
+            });
         }
     }
 }
