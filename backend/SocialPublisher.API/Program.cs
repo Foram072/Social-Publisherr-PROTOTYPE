@@ -114,6 +114,10 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
+
+// Data protection for token encryption
+builder.Services.AddDataProtection();
+builder.Services.AddSingleton<ITokenProtector, TokenProtector>();
 builder.Services.AddScoped<TokenService>();
 
 // Register HTTP Clients and Publishers
@@ -125,11 +129,19 @@ builder.Services.AddHttpClient<LinkedInPublisher>();
 builder.Services.AddScoped<ISocialPublisher, LinkedInPublisher>();
 builder.Services.AddHttpClient<PinterestPublisher>();
 builder.Services.AddScoped<ISocialPublisher, PinterestPublisher>();
+builder.Services.AddHttpClient<YouTubePublisher>();
+builder.Services.AddScoped<ISocialPublisher, YouTubePublisher>();
+builder.Services.AddHttpClient<XPublisher>();
+builder.Services.AddScoped<ISocialPublisher, XPublisher>();
 builder.Services.AddScoped<SocialPublishingService>();
 builder.Services.AddHostedService<PostSchedulerBackgroundService>();
 builder.Services.AddScoped<ISocialAnalyticsService, SocialAnalyticsService>();
 builder.Services.AddScoped<ISocialEngagementService, SocialEngagementService>();
 builder.Services.AddScoped<ISocialDiscoveryService, SocialDiscoveryService>();
+
+// Google Ads integration
+builder.Services.AddHttpClient<GoogleAdsService>();
+builder.Services.AddScoped<IGoogleAdsService, GoogleAdsService>();
 
 // Add DbContext (PostgreSQL)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -192,7 +204,7 @@ using (var scope = app.Services.CreateScope())
     // Make sure there is one account row per platform (so foreign keys work).
     // IMPORTANT: a token from appsettings.json is only used as a FIRST-TIME seed.
     // Once a token has been saved (for example by the "connect" flow), it is never overwritten here.
-    var platforms = new[] { "facebook", "instagram", "linkedin", "pinterest" };
+    var platforms = new[] { "facebook", "instagram", "linkedin", "pinterest", "youtube", "x" };
     foreach (var platform in platforms)
     {
         var key = char.ToUpper(platform[0]) + platform.Substring(1);
@@ -266,7 +278,7 @@ if (webFolder != null)
     app.Use(async (context, next) =>
     {
         var path = context.Request.Path.Value;
-        if (!string.IsNullOrEmpty(path) && !path.StartsWith("/api") && !path.StartsWith("/swagger") && !path.StartsWith("/uploads") && !path.StartsWith("/signin-google") && !path.StartsWith("/signin-linkedin") && !path.StartsWith("/signin-facebook"))
+        if (!string.IsNullOrEmpty(path) && !path.StartsWith("/api") && !path.StartsWith("/swagger") && !path.StartsWith("/uploads") && !path.StartsWith("/signin-google") && !path.StartsWith("/signin-linkedin") && !path.StartsWith("/signin-facebook") && !path.StartsWith("/api/googleads"))
         {
             // If path has no extension, check if an html file exists
             if (!Path.HasExtension(path))

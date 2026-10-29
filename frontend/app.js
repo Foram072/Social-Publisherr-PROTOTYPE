@@ -6,13 +6,19 @@ const API_BASE = `${API_ORIGIN}/api/social`;
 const PLATFORM_ICONS = {
     facebook: "bi-facebook",
     instagram: "bi-instagram",
-    linkedin: "bi-linkedin"
+    linkedin: "bi-linkedin",
+    pinterest: "bi-pinterest",
+    youtube: "bi-youtube",
+    x: "bi-twitter-x"
 };
 
 const PLATFORM_COLORS = {
     facebook: "#1877f2",
     instagram: "#e1306c",
-    linkedin: "#0a66c2"
+    linkedin: "#0a66c2",
+    pinterest: "#e60023",
+    youtube: "#ff0000",
+    x: "#111111"
 };
 
 // ============================================================

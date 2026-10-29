@@ -3,55 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect Your Social Media — Wiseliy Social</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Connect Your Social Media — Social Wise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --brand-primary: #4338ca;
+            --brand-gradient: linear-gradient(135deg, #312e81 0%, #4338ca 50%, #6366f1 100%);
+        }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0b1329;
-            color: #333;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);
+            color: #1e293b;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 30px 15px;
         }
         .onboarding-card {
             background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px -15px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+            max-width: 680px;
             width: 100%;
             overflow: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .header-banner {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            background: var(--brand-gradient);
             color: #ffffff;
-            padding: 32px 36px;
+            padding: 36px 36px 28px;
+            position: relative;
+        }
+        .badge-pill {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         .network-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 16px 20px;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
             margin-bottom: 12px;
-            transition: all 0.2s ease;
+            background: #ffffff;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .network-row:hover {
-            border-color: #3b82f6;
-            background-color: #f8fafc;
+            border-color: #6366f1;
+            box-shadow: 0 6px 20px -5px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
         }
-        .badge-brand {
-            background-color: rgba(255,255,255,0.2);
-            color: #ffffff;
+        .network-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+        .btn-connect {
             font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
+            border-radius: 10px;
+            padding: 8px 18px;
+            transition: all 0.2s;
+        }
+        .btn-connect:hover {
+            transform: scale(1.02);
         }
     </style>
 </head>
@@ -59,100 +95,227 @@
 
     <div class="onboarding-card">
         <div class="header-banner">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="badge-brand"><i class="bi bi-shield-check me-1"></i> Secure Authorization</span>
-                <span class="badge bg-warning text-dark fw-bold">Delegated Access</span>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:30px; height:30px; border-radius:8px; background:rgba(255,255,255,0.2); backdrop-filter:blur(8px); display:grid; place-items:center; color:#fff;">
+                        <i class="bi bi-share-fill" style="font-size:13px;"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold leading-none" style="font-size:13px; letter-spacing:0.3px;">Social Wise</div>
+                        <div style="font-size:9px; letter-spacing:1px; opacity:0.75; font-weight:700;">BY WISELIY</div>
+                    </div>
+                </div>
+                <span class="badge-pill">
+                    <i class="bi bi-shield-check text-warning"></i> Agency Client Portal
+                </span>
+                <span class="badge bg-emerald-500 text-white fw-bold px-3 py-1 rounded-pill" style="background:#10b981;font-size:12px;">
+                    <i class="bi bi-key-fill me-1"></i> Direct OAuth
+                </span>
             </div>
-            <h3 class="fw-bold mb-1" id="brandTitle">Connect Your Social Accounts</h3>
-            <p class="mb-0 text-white-50 small" id="brandSubtitle">Your agency is requesting permission to publish content to your social pages.</p>
+            <h3 class="fw-bold mb-1" id="brandTitle">Authorize Brand Access</h3>
+            <p class="mb-0 text-white-50 small" id="brandSubtitle">
+                Grant your marketing agency secure, delegated access to publish content directly to your company channels.
+            </p>
         </div>
 
         <div class="p-4" id="contentArea">
             <div class="text-center py-5" id="loadingSpinner">
                 <div class="spinner-border text-primary" role="status"></div>
-                <p class="text-muted mt-2">Validating invitation link...</p>
+                <p class="text-muted mt-2 fw-medium">Validating secure invitation token...</p>
             </div>
 
             <div id="invitationContent" class="d-none">
-                <div class="alert alert-info py-2 px-3 small mb-4" id="agencyMessageBanner">
-                    <i class="bi bi-info-circle-fill me-1"></i> 
-                    <span id="agencyMessageText">You do not need to share passwords. Simply approve access via official Facebook, Instagram, or LinkedIn OAuth.</span>
-                </div>
-
-                <h6 class="fw-bold text-dark mb-3">Select a Platform to Connect</h6>
-
-                <!-- FACEBOOK -->
-                <div class="network-row">
-                    <div class="d-flex align-items-center gap-3">
-                        <i class="bi bi-facebook fs-2 text-primary"></i>
+                <!-- CLIENT / AGENCY NOTE -->
+                <div class="p-3 mb-4 rounded-3 border-start border-4 border-primary bg-light">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-info-circle-fill text-primary fs-5 mt-1"></i>
                         <div>
-                            <div class="fw-bold text-dark">Facebook Pages</div>
-                            <small class="text-muted">Authorize agency to manage your official business page</small>
+                            <div class="fw-bold text-dark small" id="greetingHeader">Welcome!</div>
+                            <div class="text-muted small" id="agencyMessageText">
+                                You do not need to share any logins or passwords. Authorize your accounts via the official platforms below.
+                            </div>
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-sm px-3 fw-semibold" onclick="connectChannel('facebook')">
-                        <i class="bi bi-box-arrow-up-right me-1"></i> Connect
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-share-fill text-primary me-1"></i> Available Networks to Authorize
+                    </h6>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="refreshStatuses()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh Status
                     </button>
+                </div>
+
+                <!-- FACEBOOK -->
+                <div class="network-row" id="row-facebook">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="network-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-facebook"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Facebook Pages</div>
+                            <small class="text-muted d-block">Manage business posts, photo & video albums</small>
+                            <span class="status-indicator small text-muted" id="status-facebook">Checking...</span>
+                        </div>
+                    </div>
+                    <div id="action-facebook">
+                        <button class="btn btn-primary btn-connect" onclick="connectChannel('facebook')">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Connect
+                        </button>
+                    </div>
                 </div>
 
                 <!-- INSTAGRAM -->
-                <div class="network-row">
+                <div class="network-row" id="row-instagram">
                     <div class="d-flex align-items-center gap-3">
-                        <i class="bi bi-instagram fs-2" style="color: #e1306c;"></i>
+                        <div class="network-icon" style="background: rgba(225, 48, 108, 0.1); color: #e1306c;">
+                            <i class="bi bi-instagram"></i>
+                        </div>
                         <div>
                             <div class="fw-bold text-dark">Instagram Professional</div>
-                            <small class="text-muted">Publish images, reels, and stories</small>
+                            <small class="text-muted d-block">Publish reels, carousel posts, and images</small>
+                            <span class="status-indicator small text-muted" id="status-instagram">Checking...</span>
                         </div>
                     </div>
-                    <button class="btn btn-danger btn-sm px-3 fw-semibold" style="background-color: #e1306c; border:none;" onclick="connectChannel('instagram')">
-                        <i class="bi bi-box-arrow-up-right me-1"></i> Connect
-                    </button>
+                    <div id="action-instagram">
+                        <button class="btn text-white btn-connect" style="background:#e1306c;" onclick="connectChannel('instagram')">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Connect
+                        </button>
+                    </div>
                 </div>
 
                 <!-- LINKEDIN -->
-                <div class="network-row">
+                <div class="network-row" id="row-linkedin">
                     <div class="d-flex align-items-center gap-3">
-                        <i class="bi bi-linkedin fs-2" style="color: #0a66c2;"></i>
+                        <div class="network-icon" style="background: rgba(10, 102, 194, 0.1); color: #0a66c2;">
+                            <i class="bi bi-linkedin"></i>
+                        </div>
                         <div>
-                            <div class="fw-bold text-dark">LinkedIn Profile & Page</div>
-                            <small class="text-muted">Publish company updates and professional articles</small>
+                            <div class="fw-bold text-dark">LinkedIn Page & Profile</div>
+                            <small class="text-muted d-block">Publish official company articles, PDFs & updates</small>
+                            <span class="status-indicator small text-muted" id="status-linkedin">Checking...</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-sm px-3 fw-semibold" style="background-color: #0a66c2; border:none;" onclick="connectChannel('linkedin')">
-                        <i class="bi bi-box-arrow-up-right me-1"></i> Connect
-                    </button>
+                    <div id="action-linkedin">
+                        <button class="btn text-white btn-connect" style="background:#0a66c2;" onclick="connectChannel('linkedin')">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Connect
+                        </button>
+                    </div>
                 </div>
 
+                <!-- PINTEREST -->
+                <div class="network-row" id="row-pinterest">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="network-icon" style="background: rgba(230, 0, 35, 0.1); color: #e60023;">
+                            <i class="bi bi-pinterest"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Pinterest Business</div>
+                            <small class="text-muted d-block">Publish product pins and campaign moodboards</small>
+                            <span class="status-indicator small text-muted" id="status-pinterest">Checking...</span>
+                        </div>
+                    </div>
+                    <div id="action-pinterest">
+                        <button class="btn text-white btn-connect" style="background:#e60023;" onclick="connectChannel('pinterest')">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Connect
+                        </button>
+                    </div>
+                </div>
+
+                <!-- YOUTUBE -->
+                <div class="network-row" id="row-youtube">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="network-icon" style="background: rgba(255, 0, 0, 0.1); color: #ff0000;">
+                            <i class="bi bi-youtube"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">YouTube Channel</div>
+                            <small class="text-muted d-block">Upload shorts, brand videos & manage channel</small>
+                            <span class="status-indicator small text-muted" id="status-youtube">Checking...</span>
+                        </div>
+                    </div>
+                    <div id="action-youtube">
+                        <button class="btn text-white btn-connect" style="background:#ff0000;" onclick="connectChannel('youtube')">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Connect
+                        </button>
+                    </div>
+                </div>
+
+                <!-- X (TWITTER) -->
+                <div class="network-row" id="row-x">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="network-icon bg-dark text-white">
+                            <i class="bi bi-twitter-x"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">X / Twitter</div>
+                            <small class="text-muted d-block">Publish announcements, threads and media</small>
+                            <span class="status-indicator small text-muted" id="status-x">Checking...</span>
+                        </div>
+                    </div>
+                    <div id="action-x">
+                        <button class="btn btn-dark btn-connect" onclick="connectChannel('x')">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Connect
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GOOGLE ADS -->
+                <div class="network-row" id="row-googleads">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="network-icon" style="background: rgba(234, 67, 53, 0.1); color: #ea4335;">
+                            <i class="bi bi-google"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Google Ads Customer Account</div>
+                            <small class="text-muted d-block">Grant read-only reporting access for paid campaign metrics</small>
+                            <span class="status-indicator small text-muted" id="status-googleads">Checking...</span>
+                        </div>
+                    </div>
+                    <div id="action-googleads">
+                        <button class="btn btn-outline-danger btn-connect" onclick="connectGoogleAds()">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Connect Ads
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
                 <div class="text-center mt-4 pt-3 border-top text-muted small">
-                    <i class="bi bi-lock-fill text-success me-1"></i> Powered by Wiseliy Social &bull; 100% Direct OAuth &bull; Password-free
+                    <i class="bi bi-lock-fill text-success me-1"></i> 
+                    Protected by 256-bit encryption &bull; You retain full ownership &bull; Revoke access anytime
                 </div>
             </div>
 
-            <div id="errorArea" class="d-none alert alert-danger p-4 text-center">
+            <!-- ERROR DISPLAY -->
+            <div id="errorArea" class="d-none alert alert-danger p-4 text-center rounded-3">
                 <i class="bi bi-exclamation-triangle-fill fs-1 text-danger d-block mb-2"></i>
-                <h5 class="fw-bold" id="errorTitle">Invitation Error</h5>
-                <p class="mb-0" id="errorMsg">This connection link is invalid or has expired.</p>
+                <h5 class="fw-bold" id="errorTitle">Invitation Not Found</h5>
+                <p class="mb-0" id="errorMsg">This authorization link is invalid or has expired.</p>
             </div>
         </div>
     </div>
 
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        const API_BASE = window.location.origin.includes("5293") || window.location.origin.includes("localhost")
-            ? `${window.location.origin}/api/social`
-            : "http://localhost:5293/api/social";
+        const API_ORIGIN = window.location.origin;
+        const API_BASE = `${API_ORIGIN}/api/social`;
         let targetClientId = null;
+        let invitationToken = null;
 
         async function init() {
             const params = new URLSearchParams(window.location.search);
-            const token = params.get("token");
+            invitationToken = params.get("token");
 
-            if (!token) {
-                showError("No invitation token provided in the URL.");
+            if (!invitationToken) {
+                showError("No invitation token provided. Please use the complete link provided by your agency.");
                 return;
             }
 
             try {
-                const res = await fetch(`${API_BASE}/invitations/resolve/${encodeURIComponent(token)}`);
+                const res = await fetch(`${API_BASE}/invitations/resolve/${encodeURIComponent(invitationToken)}`);
                 const data = await res.json();
 
                 if (!res.ok) {
@@ -161,16 +324,71 @@
                 }
 
                 targetClientId = data.clientId;
-                document.getElementById("brandTitle").innerText = `Connect to ${data.clientName || "Brand Workspace"}`;
+                document.getElementById("brandTitle").innerText = `Authorize for ${data.clientName || "Brand Workspace"}`;
+                
+                if (data.recipientName) {
+                    document.getElementById("greetingHeader").innerText = `Hello ${data.recipientName},`;
+                }
                 if (data.message) {
                     document.getElementById("agencyMessageText").innerText = data.message;
                 }
 
                 document.getElementById("loadingSpinner").classList.add("d-none");
                 document.getElementById("invitationContent").classList.remove("d-none");
+
+                // Populate statuses from connectedAccounts returned by resolve endpoint
+                updateStatuses(data.connectedAccounts || []);
+                checkGoogleAdsStatus();
+
             } catch (err) {
-                showError("Could not reach the server: " + err.message);
+                showError("Could not reach agency server: " + err.message);
             }
+        }
+
+        function updateStatuses(accounts) {
+            const platforms = ["facebook", "instagram", "linkedin", "pinterest", "youtube", "x"];
+            platforms.forEach(p => {
+                const acc = accounts.find(a => a.platform.toLowerCase() === p && a.isConnected);
+                const statusEl = document.getElementById(`status-${p}`);
+                const actionEl = document.getElementById(`action-${p}`);
+
+                if (acc && statusEl && actionEl) {
+                    statusEl.innerHTML = `<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle-fill me-1"></i> Connected: ${escapeHtml(acc.accountName || "Active")}</span>`;
+                    actionEl.innerHTML = `<button class="btn btn-sm btn-outline-success disabled"><i class="bi bi-check-lg"></i> Authorized</button>`;
+                } else if (statusEl) {
+                    statusEl.innerText = "Not linked yet";
+                }
+            });
+        }
+
+        async function checkGoogleAdsStatus() {
+            if (!targetClientId) return;
+            try {
+                const res = await fetch(`${API_ORIGIN}/api/googleads/status/${targetClientId}`);
+                if (res.ok) {
+                    const st = await res.json();
+                    const statusEl = document.getElementById("status-googleads");
+                    const actionEl = document.getElementById("action-googleads");
+                    if (st.isConnected) {
+                        statusEl.innerHTML = `<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle-fill me-1"></i> Connected: ${escapeHtml(st.accountName || st.customerId)}</span>`;
+                        actionEl.innerHTML = `<button class="btn btn-sm btn-outline-success disabled"><i class="bi bi-check-lg"></i> Authorized</button>`;
+                    } else {
+                        statusEl.innerText = "Not linked yet";
+                    }
+                }
+            } catch (e) { }
+        }
+
+        async function refreshStatuses() {
+            if (!invitationToken) return;
+            try {
+                const res = await fetch(`${API_BASE}/invitations/resolve/${encodeURIComponent(invitationToken)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    updateStatuses(data.connectedAccounts || []);
+                    checkGoogleAdsStatus();
+                }
+            } catch (e) { }
         }
 
         function showError(msg) {
@@ -182,17 +400,43 @@
 
         function connectChannel(platform) {
             if (!targetClientId) {
-                alert("Client context not resolved.");
+                alert("Client workspace context is not resolved.");
                 return;
             }
             const oauthUrl = `${API_BASE}/accounts/connect/${encodeURIComponent(platform)}?clientId=${encodeURIComponent(targetClientId)}`;
-            const popup = window.open(oauthUrl, `Connect ${platform}`, "width=650,height=720,scrollbars=yes,resizable=yes");
+            const popup = window.open(oauthUrl, `Connect_${platform}`, "width=650,height=720,scrollbars=yes,resizable=yes");
+            
             const timer = setInterval(() => {
                 if (popup && popup.closed) {
                     clearInterval(timer);
-                    alert(`Authorization complete! Your ${platform} channel is now linked to your agency brand workspace.`);
+                    setTimeout(refreshStatuses, 800);
                 }
             }, 1000);
+        }
+
+        function connectGoogleAds() {
+            if (!targetClientId) return;
+            const url = `${API_ORIGIN}/api/googleads/connect?clientId=${targetClientId}`;
+            const popup = window.open(url, "Connect_GoogleAds", "width=600,height=700,scrollbars=yes");
+            
+            const timer = setInterval(() => {
+                if (popup && popup.closed) {
+                    clearInterval(timer);
+                    setTimeout(checkGoogleAdsStatus, 800);
+                }
+            }, 1000);
+        }
+
+        // PostMessage listener from OAuth popup
+        window.addEventListener("message", (event) => {
+            if (event.data && (event.data.type === "wiseliy-oauth" || event.data.type === "googleads-connected")) {
+                setTimeout(refreshStatuses, 500);
+            }
+        });
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
         }
 
         document.addEventListener("DOMContentLoaded", init);

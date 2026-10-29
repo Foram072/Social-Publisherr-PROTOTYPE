@@ -19,6 +19,7 @@ namespace SocialPublisher.API.Data
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<ClientConnectionInvitation> ClientConnectionInvitations { get; set; }
         public DbSet<SocialPostApproval> SocialPostApprovals { get; set; }
+        public DbSet<GoogleAdsAccount> GoogleAdsAccounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +60,46 @@ namespace SocialPublisher.API.Data
                 .WithMany(o => o.Members)
                 .HasForeignKey(u => u.OrganizationId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // ==========================================
+            // PERFORMANCE INDEXES FOR SCALABILITY
+            // ==========================================
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<SocialPost>()
+                .HasIndex(p => p.ClientId);
+
+            modelBuilder.Entity<SocialPost>()
+                .HasIndex(p => p.Status);
+
+            modelBuilder.Entity<SocialPost>()
+                .HasIndex(p => p.ScheduledAt);
+
+            modelBuilder.Entity<SocialPostPublish>()
+                .HasIndex(pp => new { pp.PostId, pp.SocialAccountId });
+
+            modelBuilder.Entity<SocialAccount>()
+                .HasIndex(a => new { a.ClientId, a.Platform });
+
+            modelBuilder.Entity<SocialConnection>()
+                .HasIndex(c => new { c.ClientId, c.Provider });
+
+            modelBuilder.Entity<ClientConnectionInvitation>()
+                .HasIndex(i => i.Token)
+                .IsUnique();
+
+            // Google Ads Account → Client (brand workspace)
+            modelBuilder.Entity<GoogleAdsAccount>()
+                .HasOne(g => g.Client)
+                .WithMany()
+                .HasForeignKey(g => g.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GoogleAdsAccount>()
+                .HasIndex(g => new { g.ClientId, g.CustomerId })
+                .IsUnique();
         }
     }
 }

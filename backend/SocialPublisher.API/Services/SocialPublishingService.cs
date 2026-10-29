@@ -70,18 +70,21 @@ namespace SocialPublisher.API.Services
             {
                 var platformLower = platform.ToLowerInvariant();
 
-                // Look for brand-specific connected account first; fall back to global/base account if not found
+                // Look for brand-specific connected account; do NOT fall back to other workspaces or global accounts
                 SocialAccount? account = null;
                 if (request.ClientId.HasValue && request.ClientId.Value > 0)
                 {
                     account = await _dbContext.SocialAccounts
+                        .OrderByDescending(a => a.IsConnected)
+                        .ThenByDescending(a => a.Id)
                         .FirstOrDefaultAsync(a => a.ClientId == request.ClientId.Value && a.Platform == platformLower && a.IsConnected, cancellationToken);
                 }
-
-                if (account == null)
+                else
                 {
                     account = await _dbContext.SocialAccounts
-                        .FirstOrDefaultAsync(a => a.Platform == platformLower, cancellationToken);
+                        .OrderByDescending(a => a.IsConnected)
+                        .ThenByDescending(a => a.Id)
+                        .FirstOrDefaultAsync(a => a.ClientId == null && a.Platform == platformLower && a.IsConnected, cancellationToken);
                 }
 
                 if (account == null || !account.IsConnected)
@@ -175,18 +178,21 @@ namespace SocialPublisher.API.Services
             {
                 var platformLower = platform.ToLowerInvariant().Trim();
 
-                // Look for brand-specific connected account first; fall back to global/base account
+                // Look for brand-specific connected account; do NOT fall back to other workspaces or global accounts
                 SocialAccount? account = null;
                 if (post.ClientId.HasValue && post.ClientId.Value > 0)
                 {
                     account = await _dbContext.SocialAccounts
+                        .OrderByDescending(a => a.IsConnected)
+                        .ThenByDescending(a => a.Id)
                         .FirstOrDefaultAsync(a => a.ClientId == post.ClientId.Value && a.Platform == platformLower && a.IsConnected, cancellationToken);
                 }
-
-                if (account == null)
+                else
                 {
                     account = await _dbContext.SocialAccounts
-                        .FirstOrDefaultAsync(a => a.Platform == platformLower, cancellationToken);
+                        .OrderByDescending(a => a.IsConnected)
+                        .ThenByDescending(a => a.Id)
+                        .FirstOrDefaultAsync(a => a.ClientId == null && a.Platform == platformLower && a.IsConnected, cancellationToken);
                 }
 
                 if (account == null || !account.IsConnected)

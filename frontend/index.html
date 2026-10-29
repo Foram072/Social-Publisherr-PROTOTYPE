@@ -1,536 +1,1072 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
+
+    <script>
+
+        // Strict Auth Guard: If not logged in, immediately redirect to /login
+
+        (function() {
+
+            try {
+
+                const user = sessionStorage.getItem("wiseliy_user");
+
+                if (!user) {
+
+                    window.location.replace("/login");
+
+                }
+
+            } catch(e) {
+
+                window.location.replace("/login");
+
+            }
+
+        })();
+
+    </script>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wiseliy – Social Publisher (v2)</title>
+
+    <title>Social Wise – Wiseliy</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="styles.css">
+
 </head>
 
 <body class="bg-light">
 
     <!-- NAVBAR -->
+
     <nav class="navbar navbar-dark bg-dark px-4 mb-4">
+
         <div class="d-flex align-items-center gap-3">
-            <span class="navbar-brand fw-bold mb-0">
-                <i class="bi bi-broadcast"></i>
-                Wiseliy Social
-                <span class="badge bg-success ms-1">Agency Suite</span>
-            </span>
+
+            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none py-1" href="/">
+                <div class="d-flex align-items-center justify-content-center" style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:#fff; box-shadow:0 3px 10px rgba(99,102,241,0.35);">
+                    <i class="bi bi-share-fill fs-5"></i>
+                </div>
+                <div class="d-flex flex-column leading-none text-white">
+                    <div class="d-flex align-items-center gap-1">
+                        <span class="fw-bold tracking-tight" style="font-size:1.15rem; font-weight:800; letter-spacing:-0.3px;">Social Wise</span>
+                        <span class="badge rounded-pill text-uppercase px-2" style="background:rgba(99,102,241,0.25); color:#a5b4fc; border:1px solid rgba(165,180,252,0.3); font-size:9px; letter-spacing:0.5px;">Agency Suite</span>
+                    </div>
+                    <span class="text-white-50" style="font-size:10px; letter-spacing:1px; font-weight:600; line-height:1; margin-top:-2px;">BY WISELIY</span>
+                </div>
+            </a>
 
             <!-- ZOHO SOCIAL STYLE BRAND / CLIENT WORKSPACE PICKER -->
+
             <div class="d-flex align-items-center gap-2 bg-secondary bg-opacity-25 px-2 py-1 rounded">
+
                 <i class="bi bi-building text-info"></i>
+
                 <span class="small text-light fw-semibold">Brand Workspace:</span>
+
                 <select class="form-select form-select-sm bg-dark text-white border-secondary" id="clientWorkspaceSelect" style="width: auto; min-width: 180px;" onchange="onWorkspaceChanged()">
+
                     <option value="">Loading workspaces...</option>
+
                 </select>
+
                 <button type="button" class="btn btn-sm btn-outline-info" title="Add New Client Workspace" onclick="openNewClientModal()">
+
                     <i class="bi bi-plus-circle"></i>
+
                 </button>
+
             </div>
+
         </div>
 
         <div class="d-flex align-items-center gap-2">
+
             <button class="btn btn-sm btn-outline-warning" onclick="openInviteClientModal()">
+
                 <i class="bi bi-person-plus-fill"></i>
+
                 Invite Client
+
             </button>
+
             <button class="btn btn-sm btn-outline-info" onclick="showBrandAnalytics()">
+
                 <i class="bi bi-bar-chart-line-fill"></i>
+
                 Analytics & Ads
+
             </button>
+
             <button class="btn btn-sm btn-outline-light" onclick="showHistory()">
+
                 <i class="bi bi-clock-history"></i>
+
                 Publishing History
+
             </button>
 
             <!-- AUTH BUTTONS / USER PROFILE -->
+
             <div id="authHeaderContainer" class="d-flex align-items-center gap-2 ms-2">
-                <a href="/login" class="btn btn-sm btn-outline-info">
-                    <i class="bi bi-box-arrow-in-right"></i> Log in
-                </a>
-                <a href="/signup" class="btn btn-sm btn-primary">
-                    Sign up for free
-                </a>
+
             </div>
+
         </div>
+
     </nav>
 
     <div class="container-xl">
+
         <div class="row g-4">
 
             <!-- LEFT: POST DETAILS -->
+
             <div class="col-lg-7">
+
                 <div class="card shadow-sm">
 
                     <div class="card-header bg-primary text-white fw-semibold">
+
                         <i class="bi bi-pencil-square"></i>
+
                         A. Post Details
+
                     </div>
 
                     <div class="card-body">
 
                         <!-- TITLE -->
+
                         <div class="mb-3">
+
                             <label class="form-label">
+
                                 Post Title
+
                                 <span class="text-muted small">(Internal Reference – Optional)</span>
+
                             </label>
+
                             <input type="text" class="form-control" id="postTitle" placeholder="e.g. Summer Campaign 2026">
+
                         </div>
 
                         <!-- CONTENT -->
+
                         <div class="mb-3">
+
                             <label class="form-label">
+
                                 Post Content
+
                                 <span class="text-danger">*</span>
+
                             </label>
+
                             <textarea class="form-control" id="postContent" rows="6" placeholder="Write your promotional content here..."></textarea>
+
                             <div class="invalid-feedback">Post content is required.</div>
+
                         </div>
 
                         <!-- MEDIA -->
+
                         <div class="mb-3">
+
                             <label class="form-label">
+
                                 Image / Video / Document
+
                                 <span class="text-muted small">(Optional – required for Instagram; documents are LinkedIn only)</span>
+
                             </label>
 
                             <input class="form-control"
+
                                    type="file"
+
                                    id="postMedia"
+
                                    accept=".jpg,.jpeg,.png,.mp4,.mov,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv"
+
                                    multiple>
 
                             <div class="form-text">
+
                                 <i class="bi bi-info-circle"></i>
+
                                 You can select multiple images/videos. The selected order is preserved.
+
                                 Documents: PDF, Word, PowerPoint, Excel, CSV.
+
                             </div>
 
                             <!-- MEDIA PREVIEW -->
+
                             <div id="mediaPreviewWrapper" class="mt-3 d-none">
+
                                 <div class="d-flex justify-content-between align-items-center mb-2">
+
                                     <strong>Selected Media</strong>
+
                                     <span class="text-muted small">Order will be preserved</span>
+
                                 </div>
 
                                 <div id="mediaPreviewList" class="row g-2"></div>
 
                                 <button type="button" class="btn btn-sm btn-outline-danger mt-3" onclick="clearMedia()">
+
                                     <i class="bi bi-x"></i>
+
                                     Remove All
+
                                 </button>
+
                             </div>
+
                         </div>
 
                     </div>
+
                 </div>
+
             </div>
 
             <!-- RIGHT: PLATFORMS -->
+
             <div class="col-lg-5">
 
                 <div class="card shadow-sm mb-3">
+
                     <div class="card-header bg-secondary text-white fw-semibold">
+
                         <i class="bi bi-share"></i>
+
                         B. Select Social Media Platforms
+
                     </div>
 
                     <div class="card-body p-0" id="platformsContainer">
+
                         <div class="d-flex align-items-center gap-2 text-muted p-3">
+
                             <div class="spinner-border spinner-border-sm"></div>
+
                             <span>Loading connected accounts...</span>
+
                         </div>
+
                     </div>
+
                 </div>
 
                 <!-- SCHEDULING & APPROVAL OPTIONS -->
+
                 <div class="card shadow-sm mb-3">
+
                     <div class="card-body py-2 px-3">
+
                         <div class="form-check form-switch mb-2">
+
                             <input class="form-check-input" type="checkbox" id="scheduleToggle" onchange="toggleScheduleOptions()">
+
                             <label class="form-check-label fw-semibold" for="scheduleToggle">
+
                                 <i class="bi bi-clock"></i> Schedule for Later
+
                             </label>
+
                         </div>
+
                         <div id="scheduleTimeGroup" class="d-none mb-3">
+
                             <label class="form-label small text-muted mb-1">Pick Publish Date & Time:</label>
+
                             <input type="datetime-local" class="form-control form-control-sm" id="scheduledAtInput">
+
                             <div class="form-text small">Post will automatically publish at this scheduled time.</div>
+
                         </div>
 
                         <hr class="my-2">
 
                         <div class="form-check form-switch">
+
                             <input class="form-check-input" type="checkbox" id="approvalToggle" onchange="toggleApprovalOptions()">
+
                             <label class="form-check-label fw-semibold text-warning-emphasis" for="approvalToggle">
+
                                 <i class="bi bi-check2-circle"></i> Submit for Client / Manager Approval
+
                             </label>
+
                         </div>
+
                         <div id="approvalNoteGroup" class="d-none mt-2">
+
                             <div class="alert alert-warning py-1 px-2 mb-0 small">
+
                                 <i class="bi bi-info-circle-fill me-1"></i> Post will not publish until an agency manager or client reviews and approves it.
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
 
                 <!-- PUBLISH BUTTON -->
+
                 <button class="btn btn-success w-100 py-3 fw-bold fs-5" id="publishBtn" onclick="publishPost()">
+
                     <i class="bi bi-send-fill"></i>
+
                     <span id="publishBtnText">Publish Now</span>
+
                 </button>
 
             </div>
+
         </div>
 
         <!-- PUBLISHING RESULTS -->
+
         <div class="row mt-4 d-none" id="resultSection">
+
             <div class="col-12">
+
                 <div class="card shadow-sm">
+
                     <div class="card-header bg-dark text-white fw-semibold">
+
                         <i class="bi bi-bar-chart-steps"></i>
+
                         C. Publishing Results
+
                     </div>
+
                     <div class="card-body p-0" id="resultsContainer"></div>
+
                 </div>
+
             </div>
+
         </div>
 
         <!-- HISTORY MODAL -->
+
         <div class="modal fade" id="historyModal" tabindex="-1">
+
             <div class="modal-dialog modal-xl">
+
                 <div class="modal-content">
 
                     <div class="modal-header bg-dark text-white">
+
                         <h5 class="modal-title">
+
                             <i class="bi bi-clock-history"></i>
+
                             Publishing History
+
                         </h5>
+
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
                     </div>
 
                     <div class="modal-body" id="historyContainer">
+
                         <p class="text-muted">Loading...</p>
+
                     </div>
 
                 </div>
+
             </div>
+
         </div>
 
         <!-- ANALYTICS MODAL -->
+
         <div class="modal fade" id="analyticsModal" tabindex="-1">
+
             <div class="modal-dialog modal-lg">
+
                 <div class="modal-content">
+
                     <div class="modal-header bg-info text-dark">
+
                         <h5 class="modal-title fw-bold">
+
                             <i class="bi bi-graph-up-arrow"></i> Post Analytics & Insights
+
                         </h5>
+
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
                     </div>
+
                     <div class="modal-body" id="analyticsContainer">
+
                         <div class="text-center py-4">
+
                             <div class="spinner-border text-info"></div>
+
                             <p class="text-muted mt-2">Fetching live metrics...</p>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <!-- BRAND & PAID ADS ANALYTICS MODAL (CEO INTEGRATION GUIDE) -->
+
         <div class="modal fade" id="brandAnalyticsModal" tabindex="-1">
+
             <div class="modal-dialog modal-xl">
+
                 <div class="modal-content">
+
                     <div class="modal-header bg-dark text-white border-secondary">
+
                         <div class="d-flex align-items-center gap-2">
+
                             <i class="bi bi-bar-chart-line-fill text-info fs-5"></i>
+
                             <h5 class="modal-title fw-bold mb-0" id="brandAnalyticsTitle">Brand Analytics & Paid Ads Insights</h5>
+
                         </div>
+
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
                     </div>
+
                     <div class="modal-body p-4 bg-light" id="brandAnalyticsContainer">
+
                         <div class="text-center py-5">
+
                             <div class="spinner-border text-primary"></div>
+
                             <p class="text-muted mt-2">Loading organic & paid performance metrics...</p>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <!-- COMMENTS & ENGAGEMENT MODAL -->
+
         <div class="modal fade" id="commentsModal" tabindex="-1">
+
             <div class="modal-dialog modal-lg">
+
                 <div class="modal-content">
+
                     <div class="modal-header bg-primary text-white">
+
                         <h5 class="modal-title fw-bold">
+
                             <i class="bi bi-chat-left-dots-fill"></i> Comments & Engagement
+
                         </h5>
+
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
                     </div>
+
                     <div class="modal-body" id="commentsContainer">
+
                         <div class="text-center py-4">
+
                             <div class="spinner-border text-primary"></div>
+
                             <p class="text-muted mt-2">Loading comments...</p>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <!-- INVITE CLIENT / SEND CONNECTION LINK MODAL -->
-        <div class="modal fade" id="inviteClientModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-warning text-dark">
-                        <h5 class="modal-title fw-bold">
-                            <i class="bi bi-send-check-fill me-1"></i> Send Connection Link to Client
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        <p class="text-muted small">
-                            Clients don't need to share passwords with your agency. Send them this secure authorization link, and their connected accounts will automatically be mapped to <strong id="inviteBrandName">this Brand Workspace</strong>.
-                        </p>
-                        <div class="mb-3">
-                            <label class="form-label small fw-semibold">Client / Contact Name</label>
-                            <input type="text" class="form-control" id="inviteClientContactName" placeholder="e.g. Sarah Jenkins">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-semibold">Client Email (Optional)</label>
-                            <input type="email" class="form-control" id="inviteClientEmail" placeholder="client@company.com">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-semibold">Note / Message</label>
-                            <textarea class="form-control" id="inviteClientMsg" rows="2" placeholder="Hi! Please click below to authorize our agency to manage your social channels."></textarea>
-                        </div>
-                        <button class="btn btn-warning w-100 fw-bold" onclick="generateClientInviteLink()">
-                            <i class="bi bi-link-45deg"></i> Generate Secure Connection Link
-                        </button>
 
-                        <div id="inviteResultArea" class="d-none mt-3 pt-3 border-top">
-                            <label class="form-label small fw-bold text-success"><i class="bi bi-check-circle-fill me-1"></i> Link Ready to Send:</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control font-monospace small" id="generatedInviteUrl" readonly>
-                                <button class="btn btn-outline-secondary" onclick="copyInviteLink()">
-                                    <i class="bi bi-clipboard"></i> Copy
-                                </button>
-                                <a id="openInviteLinkBtn" href="#" target="_blank" class="btn btn-primary">
-                                    <i class="bi bi-box-arrow-up-right"></i> Open
-                                </a>
+        <div class="modal fade" id="inviteClientModal" tabindex="-1">
+
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content shadow border-0 rounded-4 overflow-hidden">
+
+                    <div class="modal-header bg-gradient bg-warning text-dark px-4 py-3 border-0">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <div class="bg-dark text-warning p-2 rounded-3">
+
+                                <i class="bi bi-send-check-fill fs-5"></i>
+
                             </div>
-                            <small class="text-muted d-block mt-1">This link is valid for 7 days.</small>
+
+                            <div>
+
+                                <h5 class="modal-title fw-bold mb-0">Client Channel Authorization Link</h5>
+
+                                <small class="text-dark-50">Generate secure, zero-password delegated onboarding links</small>
+
+                            </div>
+
                         </div>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
                     </div>
+
+                    <div class="modal-body p-4 bg-light">
+
+                        <!-- NAV TABS: Generate Link vs Active Links -->
+
+                        <ul class="nav nav-pills nav-fill mb-3 bg-white p-1 rounded-3 border" id="inviteTab" role="tablist">
+
+                            <li class="nav-item" role="presentation">
+
+                                <button class="nav-link active fw-semibold" id="create-invite-tab" data-bs-toggle="pill" data-bs-target="#create-invite-pane" type="button" role="tab">
+
+                                    <i class="bi bi-plus-circle me-1"></i> Create Invitation
+
+                                </button>
+
+                            </li>
+
+                            <li class="nav-item" role="presentation">
+
+                                <button class="nav-link fw-semibold" id="history-invite-tab" data-bs-toggle="pill" data-bs-target="#history-invite-pane" type="button" role="tab" onclick="loadBrandInvitations()">
+
+                                    <i class="bi bi-link-45deg me-1"></i> Active Links & Status
+
+                                </button>
+
+                            </li>
+
+                        </ul>
+
+                        <div class="tab-content" id="inviteTabContent">
+
+                            <!-- TAB 1: CREATE INVITATION -->
+
+                            <div class="tab-pane fade show active" id="create-invite-pane">
+
+                                <div class="card border-0 shadow-sm p-3 bg-white rounded-3">
+
+                                    <div class="alert alert-info py-2 px-3 small border-0 mb-3 d-flex align-items-center gap-2">
+
+                                        <i class="bi bi-info-circle-fill fs-5 text-info"></i>
+
+                                        <div>
+
+                                            Clients will authorize their channels directly. All authorized accounts map automatically into workspace:
+
+                                            <strong id="inviteBrandName" class="text-primary">Selected Brand</strong>.
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row g-2">
+
+                                        <div class="col-md-6">
+
+                                            <label class="form-label small fw-semibold">Client / Contact Name</label>
+
+                                            <input type="text" class="form-control form-control-sm" id="inviteClientContactName" placeholder="e.g. Sarah Jenkins">
+
+                                        </div>
+
+                                        <div class="col-md-6">
+
+                                            <label class="form-label small fw-semibold">Client Email (Optional)</label>
+
+                                            <input type="email" class="form-control form-control-sm" id="inviteClientEmail" placeholder="client@company.com">
+
+                                        </div>
+
+                                        <div class="col-12">
+
+                                            <label class="form-label small fw-semibold">Custom Message to Client</label>
+
+                                            <textarea class="form-control form-control-sm" id="inviteClientMsg" rows="2" placeholder="Hi! Please click below to authorize our agency to manage your official social channels."></textarea>
+
+                                        </div>
+
+                                    </div>
+
+                                    <button class="btn btn-warning w-100 fw-bold mt-3 py-2 shadow-sm" onclick="generateClientInviteLink()">
+
+                                        <i class="bi bi-link-45deg me-1"></i> Generate Secure Connection Link
+
+                                    </button>
+
+                                    <div id="inviteResultArea" class="d-none mt-3 pt-3 border-top">
+
+                                        <div class="alert alert-success py-2 px-3 small d-flex align-items-center gap-2 mb-2">
+
+                                            <i class="bi bi-check-circle-fill fs-5"></i>
+
+                                            <div>
+
+                                                <strong>Secure Link Ready!</strong> Send this URL to your client or copy directly to WhatsApp, Slack, or email.
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="input-group">
+
+                                            <input type="text" class="form-control font-monospace small" id="generatedInviteUrl" readonly>
+
+                                            <button class="btn btn-outline-secondary" onclick="copyInviteLink()">
+
+                                                <i class="bi bi-clipboard"></i> Copy
+
+                                            </button>
+
+                                            <a id="openInviteLinkBtn" href="#" target="_blank" class="btn btn-primary">
+
+                                                <i class="bi bi-box-arrow-up-right"></i> Open Link
+
+                                            </a>
+
+                                        </div>
+
+                                        <small class="text-muted d-block mt-2">
+
+                                            <i class="bi bi-shield-lock-fill text-success me-1"></i> Token expires in 7 days &bull; Zero password exposure
+
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- TAB 2: ACTIVE INVITATION LINKS -->
+
+                            <div class="tab-pane fade" id="history-invite-pane">
+
+                                <div class="card border-0 shadow-sm p-3 bg-white rounded-3">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                        <span class="small fw-bold text-muted text-uppercase">Generated Invitations</span>
+
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="loadBrandInvitations()">
+
+                                            <i class="bi bi-arrow-clockwise"></i> Refresh
+
+                                        </button>
+
+                                    </div>
+
+                                    <div id="brandInvitationsList" class="small text-muted py-3 text-center">
+
+                                        Loading invitation links...
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <!-- ZOHO SOCIAL SIGNUP MODAL -->
+
         <div class="modal fade" id="signupModal" tabindex="-1">
+
             <div class="modal-dialog">
+
                 <div class="modal-content">
+
                     <div class="modal-header bg-primary text-white">
+
                         <h5 class="modal-title fw-bold">
-                            <i class="bi bi-person-plus-fill"></i> Sign up for Wiseliy Social
+
+                            <i class="bi bi-person-plus-fill"></i> Sign up for Social Wise
+
                         </h5>
+
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
                     </div>
+
                     <div class="modal-body p-4">
+
                         <p class="text-muted small mb-3">Create your agency account to manage multiple brands and social channels.</p>
+
                         <div class="mb-3">
+
                             <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+
                             <input type="text" class="form-control" id="signupFullName" placeholder="e.g. Sarah Connor">
+
                         </div>
+
                         <div class="mb-3">
+
                             <label class="form-label fw-semibold">Work Email <span class="text-danger">*</span></label>
+
                             <input type="email" class="form-control" id="signupEmail" placeholder="sarah@agency.com">
+
                         </div>
+
                         <div class="mb-3">
+
                             <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+
                             <input type="password" class="form-control" id="signupPassword" placeholder="Minimum 6 characters">
+
                         </div>
+
                         <div class="mb-3">
+
                             <label class="form-label fw-semibold">Company / Agency Name <span class="text-danger">*</span></label>
+
                             <input type="text" class="form-control" id="signupCompany" placeholder="e.g. Acme Marketing Agency">
+
                             <div class="form-text small">Your master organization / portal name.</div>
+
                         </div>
+
                         <div class="mb-3">
+
                             <label class="form-label">First Brand Name (Optional)</label>
+
                             <input type="text" class="form-control" id="signupFirstBrand" placeholder="e.g. Acme Clothing">
+
                         </div>
+
                     </div>
+
                     <div class="modal-footer">
+
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
                         <button type="button" class="btn btn-primary fw-bold" onclick="submitSignup()">Create Account</button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <!-- ZOHO SOCIAL LOGIN MODAL -->
+
         <div class="modal fade" id="loginModal" tabindex="-1">
+
             <div class="modal-dialog">
+
                 <div class="modal-content">
+
                     <div class="modal-header bg-dark text-white">
+
                         <h5 class="modal-title fw-bold">
-                            <i class="bi bi-box-arrow-in-right"></i> Log in to Wiseliy Social
+
+                            <i class="bi bi-box-arrow-in-right"></i> Log in to Social Wise
+
                         </h5>
+
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
                     </div>
+
                     <div class="modal-body p-4">
+
                         <div class="mb-3">
+
                             <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+
                             <input type="email" class="form-control" id="loginEmail" placeholder="yourname@company.com">
+
                         </div>
+
                         <div class="mb-3">
+
                             <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+
                             <input type="password" class="form-control" id="loginPassword" placeholder="••••••••">
+
                         </div>
+
                     </div>
+
                     <div class="modal-footer">
+
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
                         <button type="button" class="btn btn-primary fw-bold" onclick="submitLogin()">Log In</button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <!-- NEW CLIENT WORKSPACE MODAL -->
+
         <div class="modal fade" id="newClientModal" tabindex="-1">
+
             <div class="modal-dialog">
+
                 <div class="modal-content">
+
                     <div class="modal-header bg-dark text-white">
+
                         <h5 class="modal-title"><i class="bi bi-building"></i> Add Client / Brand Workspace</h5>
+
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
                     </div>
+
                     <div class="modal-body">
+
                         <div class="mb-3">
+
                             <label class="form-label fw-semibold">Brand / Client Name <span class="text-danger">*</span></label>
+
                             <input type="text" class="form-control" id="newClientName" placeholder="e.g. ABC Interiors, Nike EMEA">
+
                         </div>
+
                         <div class="mb-3">
+
                             <label class="form-label">Description (Optional)</label>
+
                             <input type="text" class="form-control" id="newClientDesc" placeholder="e.g. Interior Design & Home Decor brand">
+
                         </div>
+
                     </div>
+
                     <div class="modal-footer">
+
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
                         <button type="button" class="btn btn-primary" onclick="submitCreateWorkspace()">Create Workspace</button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <!-- ZOHO SOCIAL STYLE: ASSET DISCOVERY & SELECTION MODAL -->
+
         <div class="modal fade" id="discoverAccountsModal" tabindex="-1" data-bs-backdrop="static">
+
             <div class="modal-dialog modal-lg">
+
                 <div class="modal-content">
+
                     <div class="modal-header bg-success text-white">
+
                         <h5 class="modal-title fw-bold">
+
                             <i class="bi bi-diagram-3-fill"></i> Select Accounts to Connect
+
                         </h5>
+
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
                     </div>
+
                     <div class="modal-body">
+
                         <div class="alert alert-info py-2 small mb-3">
+
                             <i class="bi bi-info-circle-fill"></i>
+
                             Select which Pages, Profiles, or Channels you want to link to <strong id="discoverModalTargetWorkspaceName">the selected brand</strong>.
+
                         </div>
 
                         <div id="discoveredAssetsListContainer">
+
                             <div class="text-center py-4">
+
                                 <div class="spinner-border text-success"></div>
+
                                 <p class="text-muted mt-2">Discovering pages and profiles from social provider...</p>
+
                             </div>
+
                         </div>
+
                     </div>
+
                     <div class="modal-footer">
+
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
     </div>
 
     <!-- BOOTSTRAP -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- APPLICATION JS (inlined below, so no separate app.js is needed) -->
+
     <script>
+
         console.log("page loaded - documents (PDF, Word, PowerPoint, Excel, CSV) enabled");
+
         // When the page is opened from the API itself (http://localhost:5293) the addresses are relative.
+
         // When it is opened as a file from disk (file://), it talks to the API on localhost:5293.
+
         const API_ORIGIN = window.location.protocol === "file:" ? "http://localhost:5293" : "";
+
         const API_BASE = `${API_ORIGIN}/api/social`;
 
         const PLATFORM_ICONS = {
+
             facebook: "bi-facebook",
+
             instagram: "bi-instagram",
+
             linkedin: "bi-linkedin",
+
             pinterest: "bi-pinterest"
+
         };
 
         const PLATFORM_COLORS = {
+
             facebook: "#1877f2",
+
             instagram: "#e1306c",
+
             linkedin: "#0a66c2",
+
             pinterest: "#e60023"
+
         };
 
         // ============================================================
+
         // SUPPORTED FILE TYPES
+
         // ============================================================
 
         const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
+
         const VIDEO_EXTENSIONS = [".mp4", ".mov"];
 
         // Documents (LinkedIn only): label + icon + colour for the preview card
+
         const DOCUMENT_TYPES = {
+
             ".pdf": { label: "PDF", icon: "bi-file-earmark-pdf-fill", color: "#dc3545" },
+
             ".doc": { label: "Word", icon: "bi-file-earmark-word-fill", color: "#2b579a" },
+
             ".docx": { label: "Word", icon: "bi-file-earmark-word-fill", color: "#2b579a" },
+
             ".ppt": { label: "PowerPoint", icon: "bi-file-earmark-ppt-fill", color: "#d24726" },
+
             ".pptx": { label: "PowerPoint", icon: "bi-file-earmark-ppt-fill", color: "#d24726" },
+
             ".xls": { label: "Excel", icon: "bi-file-earmark-excel-fill", color: "#198754" },
+
             ".xlsx": { label: "Excel", icon: "bi-file-earmark-excel-fill", color: "#198754" },
+
             ".csv": { label: "CSV", icon: "bi-file-earmark-spreadsheet-fill", color: "#198754" }
+
         };
 
         const SUPPORTED_TYPES_TEXT =
+
             "JPG, PNG, MP4, MOV (images/videos) or PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, CSV (LinkedIn documents)";
 
         function getExtension(fileName) {
 
             const name = String(fileName || "").toLowerCase();
+
             const dot = name.lastIndexOf(".");
 
             return dot >= 0 ? name.substring(dot) : "";
+
         }
 
         // Returns "image", "video", "document" or "unknown"
+
         function getFileKind(file) {
 
             const ext = getExtension(file.name);
 
             if (IMAGE_EXTENSIONS.includes(ext)) return "image";
+
             if (VIDEO_EXTENSIONS.includes(ext)) return "video";
+
             if (DOCUMENT_TYPES[ext]) return "document";
 
             // Fall back to the browser's MIME type when the extension is missing
+
             if (file.type === "image/jpeg" || file.type === "image/png") return "image";
+
             if (file.type === "video/mp4" || file.type === "video/quicktime") return "video";
+
             if (file.type === "application/pdf") return "document";
 
             return "unknown";
+
         }
 
         function getDocumentInfo(file) {
@@ -538,33 +1074,47 @@
             const ext = getExtension(file.name);
 
             if (DOCUMENT_TYPES[ext]) {
+
                 return DOCUMENT_TYPES[ext];
+
             }
 
             if (file.type === "application/pdf") {
+
                 return DOCUMENT_TYPES[".pdf"];
+
             }
 
             return {
+
                 label: "Document",
+
                 icon: "bi-file-earmark-fill",
+
                 color: "#6c757d"
+
             };
+
         }
 
-
         // ============================================================
+
         // GLOBAL MEDIA STATE
+
         // ============================================================
 
         // IMPORTANT:
+
         // This must be outside publishPost() because multiple functions
+
         // need access to the selected files.
+
         let selectedMediaFiles = [];
 
-
         // ============================================================
+
         // STARTUP
+
         // ============================================================
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -574,13 +1124,17 @@
             const mediaInput = document.getElementById("postMedia");
 
             if (mediaInput) {
+
                 mediaInput.addEventListener("change", handleMediaSelection);
+
             }
+
         });
 
-
         // ============================================================
+
         // MEDIA SELECTION
+
         // ============================================================
 
         function handleMediaSelection() {
@@ -588,32 +1142,47 @@
             const input = document.getElementById("postMedia");
 
             if (!input || !input.files) {
+
                 return;
+
             }
 
             const newFiles = Array.from(input.files);
 
             // Add newly selected files to the existing list.
+
             selectedMediaFiles.push(...newFiles);
 
             // Optional: prevent duplicate files
+
             selectedMediaFiles = selectedMediaFiles.filter(
+
                 (file, index, array) =>
+
                     index === array.findIndex(
+
                         f =>
+
                             f.name === file.name &&
+
                             f.size === file.size &&
+
                             f.lastModified === file.lastModified
+
                     )
+
             );
 
             syncMediaInput();
+
             renderMediaPreviews();
+
         }
 
-
         // ============================================================
+
         // KEEP INPUT IN SYNC WITH OUR ARRAY
+
         // ============================================================
 
         function syncMediaInput() {
@@ -621,38 +1190,49 @@
             const input = document.getElementById("postMedia");
 
             if (!input) {
+
                 return;
+
             }
 
             const dataTransfer = new DataTransfer();
 
             selectedMediaFiles.forEach(file => {
+
                 dataTransfer.items.add(file);
+
             });
 
             input.files = dataTransfer.files;
+
         }
 
-
         // ============================================================
+
         // REMOVE ONE MEDIA FILE
+
         // ============================================================
 
         function removeMedia(index) {
 
             if (index < 0 || index >= selectedMediaFiles.length) {
+
                 return;
+
             }
 
             selectedMediaFiles.splice(index, 1);
 
             syncMediaInput();
+
             renderMediaPreviews();
+
         }
 
-
         // ============================================================
+
         // REMOVE ALL MEDIA
+
         // ============================================================
 
         function clearMedia() {
@@ -662,32 +1242,41 @@
             const input = document.getElementById("postMedia");
 
             if (input) {
+
                 input.value = "";
+
             }
 
             renderMediaPreviews();
+
         }
 
-
         // ============================================================
+
         // MEDIA PREVIEW
+
         // ============================================================
 
         function renderMediaPreviews() {
 
             const wrapper = document.getElementById("mediaPreviewWrapper");
+
             const list = document.getElementById("mediaPreviewList");
 
             if (!wrapper || !list) {
+
                 return;
+
             }
 
             if (selectedMediaFiles.length === 0) {
 
                 wrapper.classList.add("d-none");
+
                 list.innerHTML = "";
 
                 return;
+
             }
 
             wrapper.classList.remove("d-none");
@@ -705,17 +1294,29 @@
                     const url = URL.createObjectURL(file);
 
                     previewHtml = `
+
                             <video
+
                                 src="${url}"
+
                                 controls
+
                                 preload="metadata"
+
                                 style="
+
                                     width:100%;
+
                                     height:150px;
+
                                     object-fit:cover;
+
                                     border-radius:8px;
+
                                 ">
+
                             </video>
+
                         `;
 
                 } else if (kind === "document") {
@@ -723,21 +1324,37 @@
                     const info = getDocumentInfo(file);
 
                     previewHtml = `
+
                             <div style="
+
                                 width:100%;
+
                                 height:150px;
+
                                 border-radius:8px;
+
                                 background:#f8f9fa;
+
                                 display:flex;
+
                                 flex-direction:column;
+
                                 align-items:center;
+
                                 justify-content:center;
+
                                 border: 2px dashed #dee2e6;
+
                             ">
+
                                 <i class="bi ${info.icon}" style="font-size:3rem; color:${info.color};"></i>
+
                                 <span class="badge mt-2" style="background:${info.color};">${info.label}</span>
+
                                 <small class="text-muted mt-1">LinkedIn only</small>
+
                             </div>
+
                         `;
 
                 } else if (kind === "image") {
@@ -745,36 +1362,63 @@
                     const url = URL.createObjectURL(file);
 
                     previewHtml = `
+
                             <img
+
                                 src="${url}"
+
                                 alt="${escapeHtml(file.name)}"
+
                                 style="
+
                                     width:100%;
+
                                     height:150px;
+
                                     object-fit:cover;
+
                                     border-radius:8px;
+
                                 ">
+
                         `;
 
                 } else {
 
                     // Unknown type: show a neutral card instead of a broken image
+
                     previewHtml = `
+
                             <div style="
+
                                 width:100%;
+
                                 height:150px;
+
                                 border-radius:8px;
+
                                 background:#f8f9fa;
+
                                 display:flex;
+
                                 flex-direction:column;
+
                                 align-items:center;
+
                                 justify-content:center;
+
                                 border: 2px dashed #dc3545;
+
                             ">
+
                                 <i class="bi bi-exclamation-triangle-fill" style="font-size:2.5rem; color:#dc3545;"></i>
+
                                 <small class="text-danger mt-2">Unsupported file</small>
+
                             </div>
+
                         `;
+
                 }
 
                 const item = document.createElement("div");
@@ -782,23 +1426,33 @@
                 item.className = "col-6 col-md-4 col-lg-3";
 
                 item.innerHTML = `
+
                         <div class="border rounded p-2 bg-white h-100 position-relative shadow-sm">
 
                             ${previewHtml}
 
                             <div class="small text-truncate mt-2 fw-semibold"
+
                                  title="${escapeHtml(file.name)}">
+
                                 ${index + 1}. ${escapeHtml(file.name)}
+
                             </div>
 
                             <div class="small text-muted">
+
                                 ${formatFileSize(file.size)}
+
                             </div>
 
                             <button
+
                                 type="button"
+
                                 class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+
                                 onclick="removeMedia(${index})"
+
                                 title="Remove this file">
 
                                 <i class="bi bi-x-lg"></i>
@@ -806,15 +1460,19 @@
                             </button>
 
                         </div>
+
                     `;
 
                 list.appendChild(item);
+
             });
+
         }
 
-
         // ============================================================
+
         // FILE VALIDATION
+
         // ============================================================
 
         function validateMediaFiles() {
@@ -826,68 +1484,105 @@
                 if (kind === "unknown") {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             `Unsupported file type: ${file.name}. ` +
+
                             `Use ${SUPPORTED_TYPES_TEXT}.`
+
                     };
+
                 }
 
                 // Image maximum = 8 MB
+
                 if (kind === "image" && file.size > 8 * 1024 * 1024) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             `Image "${file.name}" is too large. ` +
+
                             `Maximum image size is 8 MB.`
+
                     };
+
                 }
 
                 // Video maximum = 100 MB
+
                 if (kind === "video" && file.size > 100 * 1024 * 1024) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             `Video "${file.name}" is too large. ` +
+
                             `Maximum video size is 100 MB.`
+
                     };
+
                 }
 
                 // Document maximum = 50 MB
+
                 if (kind === "document" && file.size > 50 * 1024 * 1024) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             `Document "${file.name}" is too large. ` +
+
                             `Maximum document size is 50 MB.`
+
                     };
+
                 }
+
             }
 
             return {
+
                 valid: true,
+
                 message: ""
+
             };
+
         }
 
-
         // ============================================================
+
         // PLATFORM-SPECIFIC VALIDATION
+
         // ============================================================
 
         function validatePlatformMedia(selectedPlatforms) {
 
             const images = selectedMediaFiles.filter(f => getFileKind(f) === "image");
+
             const videos = selectedMediaFiles.filter(f => getFileKind(f) === "video");
+
             const documents = selectedMediaFiles.filter(f => getFileKind(f) === "document");
 
             const hasMedia = selectedMediaFiles.length > 0;
 
             // --------------------------------------------------------
+
             // Documents can only be posted to LinkedIn
+
             // --------------------------------------------------------
 
             if (documents.length > 0) {
@@ -897,16 +1592,25 @@
                 if (others.length > 0) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             "Documents (PDF, Word, PowerPoint, Excel, CSV) can only be posted to LinkedIn. " +
+
                             "Untick the other platforms, or remove the document."
+
                     };
+
                 }
+
             }
 
             // --------------------------------------------------------
+
             // Instagram
+
             // --------------------------------------------------------
 
             if (selectedPlatforms.includes("instagram")) {
@@ -914,25 +1618,39 @@
                 if (!hasMedia || (images.length + videos.length) === 0) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             "Instagram requires at least one image or video."
+
                     };
+
                 }
 
                 // Instagram carousel supports up to 10 items.
+
                 if (selectedMediaFiles.length > 10) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             "Instagram supports a maximum of 10 media items in one carousel."
+
                     };
+
                 }
+
             }
 
             // --------------------------------------------------------
+
             // LinkedIn
+
             // --------------------------------------------------------
 
             if (selectedPlatforms.includes("linkedin")) {
@@ -940,147 +1658,223 @@
                 if (documents.length > 1) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             "LinkedIn allows only one document per post. Remove the extra documents."
+
                     };
+
                 }
 
                 if (documents.length === 1 && (images.length > 0 || videos.length > 0)) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             "LinkedIn cannot combine a document with images or a video. Post the document on its own."
+
                     };
+
                 }
 
                 if (videos.length > 1) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             "LinkedIn allows only one video per post. Remove the extra videos."
+
                     };
+
                 }
 
                 if (videos.length === 1 && images.length > 0) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             "LinkedIn cannot combine images and a video in one post. Use only images, or a single video."
+
                     };
+
                 }
 
                 if (images.length > 9) {
 
                     return {
+
                         valid: false,
+
                         message:
+
                             "LinkedIn allows up to 9 images in one post."
+
                     };
+
                 }
+
             }
 
             return {
+
                 valid: true,
+
                 message: ""
+
             };
+
         }
 
         function toggleScheduleOptions() {
+
             const isChecked = document.getElementById("scheduleToggle")?.checked;
+
             const timeGroup = document.getElementById("scheduleTimeGroup");
+
             const btnText = document.getElementById("publishBtnText");
+
             const btn = document.getElementById("publishBtn");
 
             if (isChecked) {
+
                 timeGroup?.classList.remove("d-none");
+
                 if (btnText) btnText.textContent = "Schedule Post";
+
                 btn?.classList.replace("btn-success", "btn-warning");
+
                 // Pre-fill with default 10 minutes in the future if empty
+
                 const input = document.getElementById("scheduledAtInput");
+
                 if (input && !input.value) {
+
                     const tenMinLater = new Date(Date.now() + 10 * 60 * 1000);
+
                     // format for datetime-local: YYYY-MM-DDTHH:mm
+
                     const tzOffset = tenMinLater.getTimezoneOffset() * 60000;
+
                     input.value = new Date(tenMinLater.getTime() - tzOffset).toISOString().slice(0, 16);
+
                 }
+
             } else {
+
                 timeGroup?.classList.add("d-none");
+
                 if (btnText) btnText.textContent = "Publish Now";
+
                 btn?.classList.replace("btn-warning", "btn-success");
+
             }
+
         }
 
-
         // ============================================================
+
         // PUBLISH POST
+
         // ============================================================
 
         async function publishPost() {
 
             const content =
+
                 document.getElementById("postContent")
+
                     .value
+
                     .trim();
 
             const title =
+
                 document.getElementById("postTitle")
+
                     .value
+
                     .trim();
 
             const btn =
+
                 document.getElementById("publishBtn");
 
-
             // --------------------------------------------------------
+
             // Content validation
+
             // --------------------------------------------------------
 
             if (!content) {
 
                 document
+
                     .getElementById("postContent")
+
                     .classList.add("is-invalid");
 
                 alert("Post content is required.");
 
                 return;
+
             }
 
             document
+
                 .getElementById("postContent")
+
                 .classList.remove("is-invalid");
 
-
             // --------------------------------------------------------
+
             // Platform validation
+
             // --------------------------------------------------------
 
             const selected =
+
                 Array.from(
+
                     document.querySelectorAll(
+
                         ".platform-checkbox:checked"
+
                     )
+
                 ).map(cb => cb.value);
 
             if (selected.length === 0) {
 
                 alert(
+
                     "Please select at least one social media platform."
+
                 );
 
                 return;
+
             }
 
-
             // --------------------------------------------------------
+
             // Media validation
+
             // --------------------------------------------------------
 
             const mediaValidation =
+
                 validateMediaFiles();
 
             if (!mediaValidation.valid) {
@@ -1088,10 +1882,11 @@
                 alert(mediaValidation.message);
 
                 return;
+
             }
 
-
             const platformValidation =
+
                 validatePlatformMedia(selected);
 
             if (!platformValidation.valid) {
@@ -1099,134 +1894,188 @@
                 alert(platformValidation.message);
 
                 return;
+
             }
 
-
             // --------------------------------------------------------
+
             // Prevent duplicate submission
+
             // --------------------------------------------------------
 
             btn.disabled = true;
 
             btn.innerHTML = `
-                    <span class="spinner-border spinner-border-sm me-2"></span>
-                    Uploading media...
-                `;
 
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+
+                    Uploading media...
+
+                `;
 
             try {
 
                 // ====================================================
+
                 // STEP 1: Upload every selected media file
+
                 // ====================================================
 
                 const mediaIds = [];
 
                 for (
+
                     let index = 0;
+
                     index < selectedMediaFiles.length;
+
                     index++
+
                 ) {
 
                     const file =
+
                         selectedMediaFiles[index];
 
                     btn.innerHTML = `
+
                             <span class="spinner-border spinner-border-sm me-2"></span>
+
                             Uploading ${index + 1}/${selectedMediaFiles.length}...
+
                         `;
 
-
                     const formData =
+
                         new FormData();
 
                     formData.append(
+
                         "file",
+
                         file
+
                     );
 
-
                     const uploadResponse =
-                        await fetch(
-                            `${API_BASE}/media`,
-                            {
-                                method: "POST",
-                                body: formData
-                            }
-                        );
 
+                        await fetch(
+
+                            `${API_BASE}/media`,
+
+                            {
+
+                                method: "POST",
+
+                                body: formData
+
+                            }
+
+                        );
 
                     let uploadResult;
 
                     try {
 
                         uploadResult =
+
                             await uploadResponse.json();
 
                     } catch {
 
                         uploadResult = {};
-                    }
 
+                    }
 
                     if (!uploadResponse.ok) {
 
                         throw new Error(
+
                             `Upload failed for "${file.name}": ` +
+
                             `${uploadResult.error || "Unknown error"}`
+
                         );
+
                     }
 
-
                     if (
+
                         uploadResult.id === undefined ||
+
                         uploadResult.id === null
+
                     ) {
 
                         throw new Error(
+
                             `Upload succeeded but no media ID was returned for "${file.name}".`
+
                         );
+
                     }
 
-
                     mediaIds.push(
+
                         uploadResult.id
+
                     );
+
                 }
 
-
                 // ====================================================
+
                 // STEP 2: Create/publish post
+
                 // ====================================================
 
                 const isScheduled = document.getElementById("scheduleToggle")?.checked;
+
                 let scheduledAtIso = null;
 
                 if (isScheduled) {
+
                     const scheduledInputVal = document.getElementById("scheduledAtInput")?.value;
+
                     if (!scheduledInputVal) {
+
                         alert("Please select a date and time for scheduled publishing.");
+
                         btn.disabled = false;
+
                         btn.innerHTML = `<i class="bi bi-calendar-check-fill"></i> Schedule Post`;
+
                         return;
+
                     }
+
                     const scheduledDate = new Date(scheduledInputVal);
+
                     if (scheduledDate <= new Date()) {
+
                         alert("Scheduled time must be in the future.");
+
                         btn.disabled = false;
+
                         btn.innerHTML = `<i class="bi bi-calendar-check-fill"></i> Schedule Post`;
+
                         return;
+
                     }
+
                     scheduledAtIso = scheduledDate.toISOString();
+
                 }
 
                 const isApproval = document.getElementById("approvalToggle")?.checked;
 
                 btn.innerHTML = `
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                        ${isApproval ? "Submitting for approval..." : (isScheduled ? "Scheduling..." : "Publishing...")}
-                    `;
 
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+
+                        ${isApproval ? "Submitting for approval..." : (isScheduled ? "Scheduling..." : "Publishing...")}
+
+                    `;
 
                 const payload = {
 
@@ -1237,7 +2086,9 @@
                     platforms: selected,
 
                     // IMPORTANT:
+
                     // This now contains ALL uploaded media IDs.
+
                     mediaIds: mediaIds,
 
                     scheduledAt: scheduledAtIso,
@@ -1245,88 +2096,119 @@
                     clientId: (typeof currentClientId !== "undefined" && currentClientId) ? currentClientId : null,
 
                     submitForApproval: !!isApproval
+
                 };
 
-
                 console.log(
+
                     "Publish payload:",
+
                     payload
+
                 );
 
-
                 const res =
+
                     await fetch(
+
                         `${API_BASE}/posts`,
+
                         {
+
                             method: "POST",
 
                             headers: {
+
                                 "Content-Type":
+
                                     "application/json"
+
                             },
 
                             body:
-                                JSON.stringify(payload)
-                        }
-                    );
 
+                                JSON.stringify(payload)
+
+                        }
+
+                    );
 
                 let result;
 
                 try {
 
                     result =
+
                         await res.json();
 
                 } catch {
 
                     result = {};
-                }
 
+                }
 
                 if (!res.ok) {
 
                     throw new Error(
+
                         result.error ||
+
                         result.message ||
+
                         "Post publishing failed."
+
                     );
+
                 }
 
-
                 // ====================================================
+
                 // STEP 3: Display result
+
                 // ====================================================
 
                 document
+
                     .getElementById("resultSection")
+
                     .classList.remove("d-none");
 
-
                 renderResults(
+
                     result.postId,
+
                     result.status,
+
                     result.results || []
+
                 );
 
-
                 document
-                    .getElementById("resultSection")
-                    .scrollIntoView({
-                        behavior: "smooth"
-                    });
 
+                    .getElementById("resultSection")
+
+                    .scrollIntoView({
+
+                        behavior: "smooth"
+
+                    });
 
             } catch (err) {
 
                 console.error(
+
                     "Publish error:",
+
                     err
+
                 );
 
                 alert(
+
                     err.message ||
+
                     "Failed to publish the post. Check the backend API."
+
                 );
 
             } finally {
@@ -1334,49 +2216,65 @@
                 btn.disabled = false;
 
                 const isStillScheduled = document.getElementById("scheduleToggle")?.checked;
+
                 btn.innerHTML = `
+
                         <i class="bi ${isStillScheduled ? 'bi-calendar-check-fill' : 'bi-send-fill'}"></i>
+
                         <span id="publishBtnText">${isStillScheduled ? 'Schedule Post' : 'Publish Now'}</span>
+
                     `;
+
             }
+
         }
 
-
         // ============================================================
+
         // LOAD SOCIAL ACCOUNTS
+
         // ============================================================
 
         async function loadAccounts() {
 
             const container =
+
                 document.getElementById(
+
                     "platformsContainer"
+
                 );
 
             try {
 
                 const res =
-                    await fetch(
-                        `${API_BASE}/accounts`
-                    );
 
+                    await fetch(
+
+                        `${API_BASE}/accounts`
+
+                    );
 
                 if (!res.ok) {
 
                     throw new Error(
+
                         "API returned " +
+
                         res.status
+
                     );
+
                 }
 
-
                 const accounts =
-                    await res.json();
 
+                    await res.json();
 
                 if (!accounts || accounts.length === 0) {
 
                     container.innerHTML = `
+
                             <div class="alert alert-warning mb-0">
 
                                 <i class="bi bi-exclamation-triangle"></i>
@@ -1384,130 +2282,190 @@
                                 No social accounts configured.
 
                                 Add credentials to
+
                                 <code>appsettings.json</code>
+
                                 and restart the API.
 
                             </div>
+
                         `;
 
                     return;
+
                 }
 
-
                 let html = "";
-
 
                 accounts.forEach(acc => {
 
                     const icon =
+
                         PLATFORM_ICONS[acc.platform]
+
                         || "bi-globe";
 
                     const color =
+
                         PLATFORM_COLORS[acc.platform]
+
                         || "#888";
 
                     const isConnected =
-                        acc.isConnected;
 
+                        acc.isConnected;
 
                     html += `
 
                             <div
+
                                 class="platform-row d-flex
+
                                        align-items-center
+
                                        justify-content-between
+
                                        p-3 border-bottom">
 
                                 <div
+
                                     class="d-flex
+
                                            align-items-center
+
                                            gap-3">
 
                                     <input
+
                                         class="form-check-input
+
                                                platform-checkbox mt-0"
+
                                         type="checkbox"
+
                                         value="${acc.platform}"
+
                                         id="chk_${acc.platform}"
+
                                         ${isConnected
+
                             ? ""
+
                             : "disabled"}>
 
                                     <label
+
                                         class="form-check-label
+
                                                d-flex
+
                                                align-items-center
+
                                                gap-2
+
                                                mb-0
+
                                                fw-semibold"
+
                                         for="chk_${acc.platform}">
 
                                         <i
+
                                             class="bi ${icon} fs-5"
+
                                             style="color:${color}">
+
                                         </i>
 
                                         <span
+
                                             class="text-capitalize">
+
                                             ${acc.platform}
+
                                         </span>
 
                                     </label>
 
                                 </div>
 
-
                                 <div
+
                                     class="d-flex
+
                                            align-items-center
+
                                            gap-2">
 
                                     <span
+
                                         class="badge ${isConnected
+
                             ? "bg-success"
+
                             : "bg-danger"
+
                         }">
 
                                         <i
+
                                             class="bi ${isConnected
+
                             ? "bi-check-circle"
+
                             : "bi-x-circle"
+
                         }">
+
                                         </i>
 
                                         ${isConnected
+
                             ? "Connected"
+
                             : "Not Connected"
+
                         }
 
                                     </span>
 
-
                                     ${!isConnected
+
                             ? `<button
+
                 class="btn btn-sm btn-outline-primary"
+
                 onclick="connectPlatform('${acc.platform}')">
+
                 <i class="bi bi-link-45deg"></i>
+
                 Connect
+
            </button>`
+
                             : `<button
+
                 class="btn btn-sm btn-outline-danger"
+
                 onclick="disconnectAccount(${acc.id}, '${acc.platform}')">
+
                 <i class="bi bi-x-circle"></i>
+
                 Disconnect
+
            </button>`
+
                         }
 
                                 </div>
 
                             </div>
+
                         `;
+
                 });
 
-
                 container.innerHTML = html;
-
 
             } catch (err) {
 
@@ -1518,7 +2476,9 @@
                             <i class="bi bi-exclamation-circle"></i>
 
                             <strong>
+
                                 Cannot reach backend API.
+
                             </strong>
 
                             <br>
@@ -1528,105 +2488,143 @@
                             <code>${API_BASE}</code>
 
                         </div>
+
                     `;
 
                 console.error(err);
+
             }
+
         }
 
-
         // ============================================================
+
         // OAUTH CONNECTION
+
         // ============================================================
 
         function connectPlatform(platform) {
 
             const oauthUrl =
+
                 `${API_BASE}/accounts/connect/${platform}`;
 
-
             const popup =
+
                 window.open(
+
                     oauthUrl,
+
                     `Connect ${platform}`,
+
                     "width=600,height=700,scrollbars=yes,resizable=yes"
+
                 );
 
-
             const timer =
+
                 setInterval(() => {
 
                     if (
+
                         popup &&
+
                         popup.closed
+
                     ) {
 
                         clearInterval(timer);
 
                         loadAccounts();
+
                     }
 
                 }, 1000);
+
         }
 
-
         // ============================================================
+
         // RENDER PUBLISHING RESULTS
+
         // ============================================================
 
         function renderResults(
+
             postId,
+
             overallStatus,
+
             results
+
         ) {
 
             const container =
+
                 document.getElementById(
+
                     "resultsContainer"
+
                 );
 
-
             const statusBadge =
+
                 overallStatus === "Published"
 
                     ? `<span class="badge bg-success">
+
                                Published
+
                            </span>`
 
                     : overallStatus === "Scheduled"
 
                         ? `<span class="badge bg-info text-dark">
+
                                    <i class="bi bi-clock-fill"></i> Scheduled
+
                                </span>`
 
                         : overallStatus === "NeedsApproval"
 
                             ? `<span class="badge bg-warning text-dark">
+
                                    <i class="bi bi-hourglass-split"></i> Awaiting Approval
+
                                </span>`
 
                         : overallStatus === "PartiallyPublished"
 
                             ? `<span class="badge bg-warning text-dark">
+
                                    Partially Published
+
                                </span>`
 
                             : `<span class="badge bg-danger">
-                                   Failed
-                               </span>`;
 
+                                   Failed
+
+                               </span>`;
 
             let html = `
 
                     <div
+
                         class="p-3 border-bottom
+
                                bg-light
+
                                d-flex
+
                                justify-content-between
+
                                align-items-center">
 
                         <span class="fw-semibold">
+
                             Post #${postId} – Overall Status
+
                         </span>
 
                         ${statusBadge}
@@ -1634,8 +2632,8 @@
                     </div>
 
                     <ul class="list-group list-group-flush">
-                `;
 
+                `;
 
             if (!results || results.length === 0) {
 
@@ -1646,11 +2644,13 @@
                             <div class="alert alert-warning mb-0">
 
                                 Post was created, but no platform
+
                                 result was returned.
 
                             </div>
 
                         </li>
+
                     `;
 
             } else {
@@ -1658,134 +2658,195 @@
                 results.forEach(r => {
 
                     const icon =
+
                         PLATFORM_ICONS[r.platform]
+
                         || "bi-globe";
 
                     const color =
+
                         PLATFORM_COLORS[r.platform]
+
                         || "#888";
 
                     const isPublished =
+
                         r.status === "Published";
 
                     const isScheduled =
+
                         r.status === "Scheduled" || overallStatus === "Scheduled";
 
                     const isPendingApproval =
-                        r.status === "Pending Approval" || overallStatus === "NeedsApproval";
 
+                        r.status === "Pending Approval" || overallStatus === "NeedsApproval";
 
                     let actions = "";
 
-
                     if (
+
                         isPublished &&
+
                         r.postUrl
+
                     ) {
 
                         actions += `
 
                                 <a
+
                                     href="${r.postUrl}"
+
                                     target="_blank"
+
                                     rel="noopener noreferrer"
+
                                     class="btn btn-sm
+
                                            btn-outline-primary
+
                                            ms-2">
 
                                     <i
+
                                         class="bi bi-box-arrow-up-right">
+
                                     </i>
 
                                     View Post
 
                                 </a>
-                            `;
-                    }
 
+                            `;
+
+                    }
 
                     if (!isPublished && !isScheduled && !isPendingApproval) {
 
                         actions += `
 
                                 <button
+
                                     class="btn btn-sm
+
                                            btn-warning ms-2"
+
                                     onclick="retryPost(${postId})">
 
                                     <i
+
                                         class="bi bi-arrow-clockwise">
+
                                     </i>
 
                                     Retry
 
                                 </button>
-                            `;
-                    }
 
+                            `;
+
+                    }
 
                     html += `
 
                             <li
+
                                 class="list-group-item
+
                                        d-flex
+
                                        justify-content-between
+
                                        align-items-center
+
                                        px-4 py-3">
 
                                 <div
+
                                     class="d-flex
+
                                            align-items-center
+
                                            gap-3">
 
                                     <i
-                                        class="bi ${icon} fs-4"
-                                        style="color:${color}">
-                                    </i>
 
+                                        class="bi ${icon} fs-4"
+
+                                        style="color:${color}">
+
+                                    </i>
 
                                     <div>
 
                                         <div
+
                                             class="fw-semibold
+
                                                    text-capitalize">
 
                                             ${r.platform}
 
                                         </div>
 
-
                                         <div
+
                                             class="small ${isPublished
+
                             ? "text-success"
+
                             : isScheduled
+
                                 ? "text-primary"
+
                                 : isPendingApproval
+
                                     ? "text-warning-emphasis"
+
                                     : "text-danger"
+
                         }">
 
                                             <i
+
                                                 class="bi ${isPublished
+
                             ? "bi-check-circle-fill"
+
                             : isScheduled
+
                                 ? "bi-clock-fill"
+
                                 : isPendingApproval
+
                                     ? "bi-hourglass-split"
+
                                     : "bi-x-circle-fill"
+
                         }">
+
                                             </i>
 
                                             ${isPublished
+
                             ? "Post published successfully"
+
                             : isScheduled
+
                                 ? "Scheduled for automatic publishing"
+
                                 : isPendingApproval
+
                                     ? "Submitted for client/manager approval"
+
                                     : (
+
                                         r.error ||
+
                                         "Failed"
+
                                     )
+
                         }
 
                                         </div>
@@ -1794,19 +2855,28 @@
 
                                 </div>
 
-
                                 <div
+
                                     class="d-flex
+
                                            align-items-center">
 
                                     <span
+
                                         class="badge ${isPublished
+
                             ? "bg-success"
+
                             : isScheduled
+
                                 ? "bg-info text-dark"
+
                                 : isPendingApproval
+
                                     ? "bg-warning text-dark"
+
                                     : "bg-danger"
+
                         }">
 
                                         ${r.status}
@@ -1818,24 +2888,29 @@
                                 </div>
 
                             </li>
-                        `;
-                });
-            }
 
+                        `;
+
+                });
+
+            }
 
             html += "</ul>";
 
             container.innerHTML = html;
+
         }
 
-
         // ============================================================
+
         // RETRY FAILED PLATFORMS
+
         // ============================================================
 
         async function retryPost(postId) {
 
             const btn =
+
                 event.target.closest("button");
 
             if (btn) {
@@ -1843,54 +2918,72 @@
                 btn.disabled = true;
 
                 btn.innerHTML = `
-                        <span
-                            class="spinner-border
-                                   spinner-border-sm">
-                        </span>
-                    `;
-            }
 
+                        <span
+
+                            class="spinner-border
+
+                                   spinner-border-sm">
+
+                        </span>
+
+                    `;
+
+            }
 
             try {
 
                 const res =
+
                     await fetch(
+
                         `${API_BASE}/posts/${postId}/retry`,
+
                         {
+
                             method: "POST"
+
                         }
+
                     );
 
-
                 const result =
-                    await res.json();
 
+                    await res.json();
 
                 if (!res.ok) {
 
                     throw new Error(
+
                         result.error ||
+
                         "Retry failed."
+
                     );
+
                 }
 
-
                 renderResults(
-                    result.postId,
-                    result.status,
-                    result.results || []
-                );
 
+                    result.postId,
+
+                    result.status,
+
+                    result.results || []
+
+                );
 
             } catch (err) {
 
                 alert(
+
                     err.message ||
+
                     "Retry failed. Check the API."
+
                 );
 
                 console.error(err);
-
 
             } finally {
 
@@ -1899,39 +2992,120 @@
                     btn.disabled = false;
 
                     btn.innerHTML = `
+
                             <i class="bi bi-arrow-clockwise"></i>
+
                             Retry
+
                         `;
+
                 }
+
             }
+
         }
 
-
         // ============================================================
+
         // PUBLISHING HISTORY
+
         // ============================================================
 
         // How many posts are shown on one page of the history window
+
         const HISTORY_PAGE_SIZE = 10;
 
+        let allHistoryPosts = [];
+
         let historyPosts = [];
+
         let historyPage = 1;
+
+        let historyFilter = 'all';
+
+        // Auto-reset filter whenever the history modal is closed
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const histModalEl = document.getElementById("historyModal");
+
+            if (histModalEl) {
+
+                histModalEl.addEventListener("hidden.bs.modal", () => {
+
+                    historyFilter = 'all';
+
+                    historyPage = 1;
+
+                });
+
+            }
+
+        });
+
+        function setHistoryFilter(filter) {
+
+            historyFilter = filter;
+
+            if (filter === 'all') {
+
+                historyPosts = allHistoryPosts.slice();
+
+            } else if (filter === 'NeedsApproval') {
+
+                historyPosts = allHistoryPosts.filter(p => p.status === 'NeedsApproval');
+
+            } else if (filter === 'Published') {
+
+                historyPosts = allHistoryPosts.filter(p => p.status === 'Published' || p.status === 'PartiallyPublished');
+
+            } else if (filter === 'Scheduled') {
+
+                historyPosts = allHistoryPosts.filter(p => p.status === 'Scheduled');
+
+            } else if (filter === 'Failed') {
+
+                historyPosts = allHistoryPosts.filter(p => p.status === 'Failed' || p.status === 'Rejected');
+
+            }
+
+            historyPage = 1;
+
+            renderHistoryPage(1);
+
+        }
 
         async function showHistory(keepPage) {
 
-            const modal =
-                bootstrap.Modal.getOrCreateInstance(
-                    document.getElementById(
-                        "historyModal"
-                    )
-                );
+            // When opening modal afresh, always reset filter to 'all'
 
+            if (!keepPage) {
+
+                historyFilter = 'all';
+
+                historyPage = 1;
+
+            }
+
+            const modal =
+
+                bootstrap.Modal.getOrCreateInstance(
+
+                    document.getElementById(
+
+                        "historyModal"
+
+                    )
+
+                );
 
             const container =
-                document.getElementById(
-                    "historyContainer"
-                );
 
+                document.getElementById(
+
+                    "historyContainer"
+
+                );
 
             container.innerHTML = `
 
@@ -1940,52 +3114,82 @@
                             <div class="spinner-border"></div>
 
                         </div>
+
                     `;
 
-
             modal.show();
-
 
             try {
 
                 const historyUrl = (typeof currentClientId !== "undefined" && currentClientId)
+
                     ? `${API_BASE}/posts?clientId=${currentClientId}`
+
                     : `${API_BASE}/posts`;
 
                 const res =
-                    await fetch(
-                        historyUrl
-                    );
 
+                    await fetch(
+
+                        historyUrl
+
+                    );
 
                 if (!res.ok) {
 
                     throw new Error(
+
                         "Failed to load history."
+
                     );
+
                 }
 
-
                 const posts =
+
                     await res.json();
 
-
                 // Newest post first
-                historyPosts =
+
+                allHistoryPosts =
+
                     (posts || [])
+
                         .slice()
+
                         .sort((a, b) => (b.id || 0) - (a.id || 0));
 
+                if (historyFilter === 'NeedsApproval') {
+
+                    historyPosts = allHistoryPosts.filter(p => p.status === 'NeedsApproval');
+
+                } else if (historyFilter === 'Published') {
+
+                    historyPosts = allHistoryPosts.filter(p => p.status === 'Published' || p.status === 'PartiallyPublished');
+
+                } else if (historyFilter === 'Scheduled') {
+
+                    historyPosts = allHistoryPosts.filter(p => p.status === 'Scheduled');
+
+                } else if (historyFilter === 'Failed') {
+
+                    historyPosts = allHistoryPosts.filter(p => p.status === 'Failed' || p.status === 'Rejected');
+
+                } else {
+
+                    historyPosts = allHistoryPosts.slice();
+
+                }
 
                 // After a retry we stay on the same page, otherwise we start on page 1
+
                 if (!keepPage) {
 
                     historyPage = 1;
+
                 }
 
-
                 renderHistoryPage(historyPage);
-
 
             } catch (err) {
 
@@ -1996,70 +3200,155 @@
                                 Failed to load history.
 
                             </div>
+
                         `;
 
                 console.error(err);
+
             }
+
         }
 
-
         // ============================================================
+
         // HISTORY: SHOW ONE PAGE
+
         // ============================================================
 
         function renderHistoryPage(page) {
 
             const container =
+
                 document.getElementById(
+
                     "historyContainer"
+
                 );
 
+            const pendingCount = (allHistoryPosts || []).filter(p => p.status === 'NeedsApproval').length;
+
+            const scheduledCount = (allHistoryPosts || []).filter(p => p.status === 'Scheduled').length;
+
+            const publishedCount = (allHistoryPosts || []).filter(p => p.status === 'Published' || p.status === 'PartiallyPublished').length;
+
+            const toolbarHtml = `
+
+                <!-- FILTER BUTTONS & APPROVAL QUEUE -->
+
+                <div class="d-flex align-items-center justify-content-between mb-3 p-2 bg-light rounded-3 border">
+
+                    <div class="btn-group btn-group-sm" role="group">
+
+                        <button type="button" class="btn ${historyFilter === 'all' ? 'btn-dark' : 'btn-outline-dark'}" onclick="setHistoryFilter('all')">
+
+                            All Posts (${(allHistoryPosts || []).length})
+
+                        </button>
+
+                        <button type="button" class="btn ${historyFilter === 'NeedsApproval' ? 'btn-warning fw-bold text-dark' : 'btn-outline-warning text-dark'}" onclick="setHistoryFilter('NeedsApproval')">
+
+                            <i class="bi bi-hourglass-split"></i> Awaiting Approval (${pendingCount})
+
+                        </button>
+
+                        <button type="button" class="btn ${historyFilter === 'Scheduled' ? 'btn-primary' : 'btn-outline-primary'}" onclick="setHistoryFilter('Scheduled')">
+
+                            <i class="bi bi-clock"></i> Scheduled (${scheduledCount})
+
+                        </button>
+
+                        <button type="button" class="btn ${historyFilter === 'Published' ? 'btn-success' : 'btn-outline-success'}" onclick="setHistoryFilter('Published')">
+
+                            <i class="bi bi-check-all"></i> Published (${publishedCount})
+
+                        </button>
+
+                    </div>
+
+                    <span class="small text-muted fw-semibold">
+
+                        Showing ${(historyPosts || []).length} post(s)
+
+                    </span>
+
+                </div>
+
+            `;
 
             if (!historyPosts || historyPosts.length === 0) {
 
-                container.innerHTML = `
+                let emptyMsg = "No posts published yet.";
 
-                            <p class="text-muted">
-                                No posts published yet.
-                            </p>
-                        `;
+                if (historyFilter === 'NeedsApproval') emptyMsg = "No posts currently awaiting approval.";
+
+                else if (historyFilter === 'Scheduled') emptyMsg = "No scheduled posts found.";
+
+                else if (historyFilter === 'Published') emptyMsg = "No published posts yet.";
+
+                container.innerHTML = toolbarHtml + `
+
+                    <div class="text-center py-5 text-muted bg-white rounded border">
+
+                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+
+                        <p class="mb-0 fw-medium">${emptyMsg}</p>
+
+                    </div>
+
+                `;
 
                 return;
+
             }
 
-
             const totalPages =
+
                 Math.max(
+
                     1,
+
                     Math.ceil(
+
                         historyPosts.length / HISTORY_PAGE_SIZE
+
                     )
+
                 );
 
             historyPage =
+
                 Math.min(
+
                     Math.max(1, page),
+
                     totalPages
+
                 );
 
-
             const start =
+
                 (historyPage - 1) * HISTORY_PAGE_SIZE;
 
             const pagePosts =
+
                 historyPosts.slice(
+
                     start,
+
                     start + HISTORY_PAGE_SIZE
+
                 );
 
-
-            let html = `
+            let html = toolbarHtml + `
 
                         <div class="table-responsive">
 
                             <table
+
                                 class="table
+
                                        table-hover
+
                                        align-middle">
 
                                 <thead class="table-dark">
@@ -2067,10 +3356,15 @@
                                     <tr>
 
                                         <th>#</th>
+
                                         <th>Title</th>
+
                                         <th>Status</th>
+
                                         <th>Platforms</th>
+
                                         <th>Date</th>
+
                                         <th>Actions</th>
 
                                     </tr>
@@ -2078,96 +3372,127 @@
                                 </thead>
 
                                 <tbody>
-                    `;
 
+                    `;
 
             pagePosts.forEach(p => {
 
-                // Determine the most accurate time to display:
-                // 1. If published, display the actual publish timestamp from platform results
-                // 2. If scheduled, display the scheduled publish time
-                // 3. Fallback to createdAt
                 let displayDateStr = "";
+
                 let dateBadge = "";
 
                 const firstPublishedResult = (p.results || []).find(r => r.publishedAt);
 
                 if (firstPublishedResult && firstPublishedResult.publishedAt) {
+
                     displayDateStr = new Date(firstPublishedResult.publishedAt).toLocaleString();
+
                     if (p.scheduledAt) {
+
                         dateBadge = `<div class="text-success small" style="font-size:0.75rem;"><i class="bi bi-check-all"></i> Published</div>`;
+
                     }
+
                 } else if (p.status === "Scheduled" && p.scheduledAt) {
+
                     displayDateStr = new Date(p.scheduledAt).toLocaleString();
+
                     dateBadge = `<div class="text-primary small" style="font-size:0.75rem;"><i class="bi bi-clock"></i> Scheduled for</div>`;
+
                 } else {
+
                     displayDateStr = new Date(p.createdAt).toLocaleString();
+
                 }
 
                 const date = `${dateBadge}<span>${displayDateStr}</span>`;
 
-
                 const platformBadges =
+
                     (p.results || [])
+
                         .map(r => {
 
                             const cls =
-                                r.status === "Published"
-                                    ? "bg-success"
-                                    : "bg-danger";
 
+                                r.status === "Published"
+
+                                    ? "bg-success"
+
+                                    : "bg-danger";
 
                             return `
 
                                         <span
+
                                             class="badge
+
                                                    ${cls}
+
                                                    text-capitalize
+
                                                    me-1">
 
                                             ${r.platform}
 
                                         </span>
+
                                     `;
+
                         })
+
                         .join("");
 
-
                 const hasFailure =
+
                     (p.results || [])
+
                         .some(
+
                             r =>
+
                                 r.status !==
+
                                 "Published"
+
                         );
 
-
                 const retryBtn =
+
                     hasFailure
 
                         ? `
 
                                     <button
+
                                         class="btn btn-sm
+
                                                btn-warning"
+
                                         onclick="retryFromHistory(
+
                                             ${p.id},
+
                                             this
+
                                         )">
 
                                         <i
+
                                             class="bi bi-arrow-clockwise">
+
                                         </i>
 
                                         Retry Failed
 
                                     </button>
+
                                   `
 
                         : "";
 
-
                 const statusClass =
+
                     p.status === "Published"
 
                         ? "bg-success"
@@ -2182,25 +3507,32 @@
 
                                 : "bg-danger";
 
-
                 html += `
 
                             <tr>
 
                                 <td>
+
                                     ${p.id}
+
                                 </td>
 
                                 <td>
+
                                     ${p.title
+
                         ? escapeHtml(p.title)
+
                         : "<em class='text-muted'>No title</em>"
+
                     }
+
                                 </td>
 
                                 <td>
 
                                     <span
+
                                         class="badge ${statusClass}">
 
                                         ${p.status}
@@ -2210,10 +3542,13 @@
                                 </td>
 
                                 <td>
+
                                     ${platformBadges}
+
                                 </td>
 
                                 <td
+
                                     class="text-muted small">
 
                                     ${date}
@@ -2221,39 +3556,68 @@
                                 </td>
 
                                 <td>
+
                                     <div class="d-flex gap-1 flex-wrap">
+
                                         ${p.status === "Published" || p.status === "PartiallyPublished" ? `
+
                                             <button class="btn btn-sm btn-outline-info" title="View Real-time Analytics" onclick="showPostAnalytics(${p.id})">
+
                                                 <i class="bi bi-graph-up-arrow"></i> Analytics
+
                                             </button>
+
                                             <button class="btn btn-sm btn-outline-primary" title="View & Reply to Comments" onclick="showPostComments(${p.id})">
+
                                                 <i class="bi bi-chat-dots"></i> Comments
+
                                             </button>
+
                                         ` : ''}
+
                                         ${p.status === "Scheduled" ? `
+
                                             <button class="btn btn-sm btn-success" title="Publish this post right now" onclick="publishScheduledNow(${p.id}, this)">
+
                                                 <i class="bi bi-send-fill"></i> Publish Now
+
                                             </button>
+
                                             <button class="btn btn-sm btn-outline-danger" title="Cancel this scheduled post" onclick="cancelScheduledPost(${p.id}, this)">
+
                                                 <i class="bi bi-x-circle"></i> Cancel
+
                                             </button>
+
                                         ` : ''}
+
                                         ${p.status === "NeedsApproval" ? `
+
                                             <button class="btn btn-sm btn-success fw-bold" title="Approve and Release Post" onclick="approvePostFromHistory(${p.id}, this)">
+
                                                 <i class="bi bi-check-lg"></i> Approve
+
                                             </button>
+
                                             <button class="btn btn-sm btn-outline-danger" title="Reject Post" onclick="rejectPostFromHistory(${p.id}, this)">
+
                                                 <i class="bi bi-x-lg"></i> Reject
+
                                             </button>
+
                                         ` : ''}
+
                                         ${retryBtn}
+
                                     </div>
+
                                 </td>
 
                             </tr>
-                        `;
-            });
 
+                        `;
+
+            });
 
             html += `
 
@@ -2262,22 +3626,27 @@
                             </table>
 
                         </div>
+
                     `;
 
-
             html += buildHistoryPagination(
+
                 totalPages,
+
                 start,
+
                 pagePosts.length
+
             );
 
-
             container.innerHTML = html;
+
         }
 
-
         // ============================================================
+
         // HISTORY: PAGE BUTTONS  (Prev  1 2 3 ... 12  Next)
+
         // ============================================================
 
         function buildHistoryPagination(totalPages, start, countOnPage) {
@@ -2285,35 +3654,49 @@
             const total = historyPosts.length;
 
             const from = start + 1;
+
             const to = start + countOnPage;
 
             const summary = `
+
                         <div class="text-muted small">
+
                             Showing ${from}-${to} of ${total} posts
+
                         </div>
+
                     `;
 
-
             // Nothing to page through
+
             if (totalPages <= 1) {
 
                 return `
+
                             <div class="mt-3">
+
                                 ${summary}
+
                             </div>
+
                         `;
+
             }
 
-
             // Page numbers: first, last, and the pages around the current one
+
             const numbers = [];
 
             for (let i = 1; i <= totalPages; i++) {
 
                 if (
+
                     i === 1 ||
+
                     i === totalPages ||
+
                     Math.abs(i - historyPage) <= 1
+
                 ) {
 
                     numbers.push(i);
@@ -2321,43 +3704,63 @@
                 } else if (numbers[numbers.length - 1] !== "...") {
 
                     numbers.push("...");
-                }
-            }
 
+                }
+
+            }
 
             const items = numbers.map(n => {
 
                 if (n === "...") {
 
                     return `
+
                                 <li class="page-item disabled">
+
                                     <span class="page-link">...</span>
+
                                 </li>
+
                             `;
+
                 }
 
                 return `
+
                             <li class="page-item ${n === historyPage ? "active" : ""}">
+
                                 <button
+
                                     type="button"
+
                                     class="page-link"
+
                                     onclick="renderHistoryPage(${n})">
+
                                     ${n}
+
                                 </button>
+
                             </li>
+
                         `;
 
             }).join("");
 
-
             return `
 
                         <div
+
                             class="d-flex
+
                                    justify-content-between
+
                                    align-items-center
+
                                    flex-wrap
+
                                    gap-2
+
                                    mt-3">
 
                             ${summary}
@@ -2367,23 +3770,37 @@
                                 <ul class="pagination pagination-sm mb-0">
 
                                     <li class="page-item ${historyPage === 1 ? "disabled" : ""}">
+
                                         <button
+
                                             type="button"
+
                                             class="page-link"
+
                                             onclick="renderHistoryPage(${historyPage - 1})">
+
                                             &laquo; Prev
+
                                         </button>
+
                                     </li>
 
                                     ${items}
 
                                     <li class="page-item ${historyPage === totalPages ? "disabled" : ""}">
+
                                         <button
+
                                             type="button"
+
                                             class="page-link"
+
                                             onclick="renderHistoryPage(${historyPage + 1})">
+
                                             Next &raquo;
+
                                         </button>
+
                                     </li>
 
                                 </ul>
@@ -2391,800 +3808,1595 @@
                             </nav>
 
                         </div>
+
                     `;
+
         }
 
-
         // ============================================================
+
         // RETRY FROM HISTORY
+
         // ============================================================
 
         async function retryFromHistory(
+
             postId,
+
             btn
+
         ) {
 
             btn.disabled = true;
 
             btn.innerHTML = `
-                    <span
-                        class="spinner-border
-                               spinner-border-sm">
-                    </span>
-                `;
 
+                    <span
+
+                        class="spinner-border
+
+                               spinner-border-sm">
+
+                    </span>
+
+                `;
 
             try {
 
                 const res =
+
                     await fetch(
+
                         `${API_BASE}/posts/${postId}/retry`,
+
                         {
+
                             method: "POST"
+
                         }
+
                     );
 
-
                 const result =
-                    await res.json();
 
+                    await res.json();
 
                 if (!res.ok) {
 
                     throw new Error(
+
                         result.error ||
+
                         "Retry failed."
+
                     );
+
                 }
 
-
                 alert(
+
                     `Retry complete. Status: ${result.status}`
+
                 );
 
-
                 showHistory(true);
-
 
             } catch (err) {
 
                 alert(
+
                     err.message ||
+
                     "Retry failed."
+
                 );
 
                 console.error(err);
-
 
             } finally {
 
                 btn.disabled = false;
 
                 btn.innerHTML = `
+
                         <i class="bi bi-arrow-clockwise"></i>
+
                         Retry Failed
+
                     `;
+
             }
+
         }
 
         async function cancelScheduledPost(postId, btn) {
+
             if (!confirm("Are you sure you want to cancel this scheduled post?")) return;
 
             btn.disabled = true;
+
             btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Cancelling...`;
 
             try {
+
                 const res = await fetch(`${API_BASE}/posts/${postId}/cancel`, { method: "POST" });
+
                 const result = await res.json();
+
                 if (!res.ok) throw new Error(result.error || "Failed to cancel post.");
+
                 alert("Scheduled post has been cancelled.");
+
                 showHistory(true);
+
             } catch (err) {
+
                 alert(err.message || "Failed to cancel post.");
+
                 btn.disabled = false;
+
                 btn.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
+
             }
+
         }
 
         async function publishScheduledNow(postId, btn) {
+
             if (!confirm("Publish this scheduled post immediately to all selected platforms?")) return;
 
             btn.disabled = true;
+
             btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Publishing...`;
 
             try {
+
                 const res = await fetch(`${API_BASE}/posts/${postId}/publish-now`, { method: "POST" });
+
                 const result = await res.json();
+
                 if (!res.ok) throw new Error(result.error || "Failed to publish post.");
+
                 alert(`Post publishing finished with status: ${result.status}`);
+
                 showHistory(true);
+
             } catch (err) {
+
                 alert(err.message || "Failed to publish post.");
+
                 btn.disabled = false;
+
                 btn.innerHTML = `<i class="bi bi-send-fill"></i> Publish Now`;
+
             }
+
         }
 
         async function approvePostFromHistory(postId, btn) {
+
             const comments = prompt("Enter approval note or comment (optional):", "Approved for release.");
+
             if (comments === null) return; // User cancelled prompt
 
             btn.disabled = true;
+
             btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Approving...`;
 
             try {
+
                 const res = await fetch(`${API_BASE}/posts/${postId}/approve`, {
+
                     method: "POST",
+
                     headers: { "Content-Type": "application/json" },
+
                     body: JSON.stringify({ reviewerName: "Client / Agency Manager", comments: comments })
+
                 });
+
                 const result = await res.json();
+
                 if (!res.ok) throw new Error(result.error || "Failed to approve post.");
+
                 alert(result.message || `Post approved! Current status: ${result.status}`);
+
                 showHistory(true);
+
             } catch (err) {
+
                 alert(err.message || "Failed to approve post.");
+
                 btn.disabled = false;
+
                 btn.innerHTML = `<i class="bi bi-check-lg"></i> Approve`;
+
             }
+
         }
 
         async function rejectPostFromHistory(postId, btn) {
+
             const reason = prompt("Enter reason for rejection:", "Changes requested before publishing.");
+
             if (reason === null) return; // User cancelled prompt
 
             btn.disabled = true;
+
             btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Rejecting...`;
 
             try {
+
                 const res = await fetch(`${API_BASE}/posts/${postId}/reject`, {
+
                     method: "POST",
+
                     headers: { "Content-Type": "application/json" },
+
                     body: JSON.stringify({ reviewerName: "Client / Agency Manager", comments: reason })
+
                 });
+
                 const result = await res.json();
+
                 if (!res.ok) throw new Error(result.error || "Failed to reject post.");
+
                 alert("Post has been marked as Rejected.");
+
                 showHistory(true);
+
             } catch (err) {
+
                 alert(err.message || "Failed to reject post.");
+
                 btn.disabled = false;
+
                 btn.innerHTML = `<i class="bi bi-x-lg"></i> Reject`;
+
             }
+
         }
 
-
         // ============================================================
+
         // HELPER FUNCTIONS
+
         // ============================================================
 
         function formatFileSize(bytes) {
 
             if (bytes === 0) {
+
                 return "0 Bytes";
+
             }
 
             const units = [
+
                 "Bytes",
+
                 "KB",
+
                 "MB",
+
                 "GB"
+
             ];
 
             const index =
+
                 Math.floor(
+
                     Math.log(bytes) /
+
                     Math.log(1024)
+
                 );
 
             return (
-                parseFloat(
-                    (bytes /
-                        Math.pow(1024, index))
-                        .toFixed(2)
-                )
-                + " "
-                + units[index]
-            );
-        }
 
+                parseFloat(
+
+                    (bytes /
+
+                        Math.pow(1024, index))
+
+                        .toFixed(2)
+
+                )
+
+                + " "
+
+                + units[index]
+
+            );
+
+        }
 
         function escapeHtml(value) {
 
             return String(value)
+
                 .replace(/&/g, "&amp;")
+
                 .replace(/</g, "&lt;")
+
                 .replace(/>/g, "&gt;")
+
                 .replace(/"/g, "&quot;")
+
                 .replace(/'/g, "&#039;");
+
         }
 
         // ============================================================
+
         // REAL-TIME ANALYTICS & INSIGHTS
+
         // ============================================================
+
         async function showPostAnalytics(postId) {
+
             const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("analyticsModal"));
+
             const container = document.getElementById("analyticsContainer");
+
             container.innerHTML = `
+
                     <div class="text-center py-4">
+
                         <div class="spinner-border text-info"></div>
+
                         <p class="text-muted mt-2">Fetching real-time insights from social platforms...</p>
+
                     </div>
+
                 `;
+
             modal.show();
 
             try {
+
                 const res = await fetch(`${API_ORIGIN}/api/social/analytics/posts/${postId}`);
+
                 if (!res.ok) {
+
                     const err = await res.json().catch(() => ({}));
+
                     throw new Error(err.error || "Failed to load analytics");
+
                 }
+
                 const data = await res.json();
+
                 renderAnalytics(data);
+
             } catch (err) {
+
                 container.innerHTML = `
+
                         <div class="alert alert-danger">
+
                             <i class="bi bi-exclamation-triangle-fill me-2"></i> ${escapeHtml(err.message)}
+
                         </div>
+
                     `;
+
             }
+
         }
 
         function renderAnalytics(data) {
+
             const container = document.getElementById("analyticsContainer");
+
             if (!data.platformMetrics || data.platformMetrics.length === 0) {
+
                 container.innerHTML = `<p class="text-muted">No platform metrics found for this post.</p>`;
+
                 return;
+
             }
 
             let cardsHtml = `
+
                     <div class="mb-3 border-bottom pb-2">
+
                         <h6 class="fw-bold mb-1">${escapeHtml(data.title || "Post #" + data.postId)}</h6>
+
                         <small class="text-muted">Created: ${new Date(data.createdAt).toLocaleString()}</small>
+
                     </div>
+
                     <div class="row g-3">
+
                 `;
 
             data.platformMetrics.forEach(m => {
+
                 const icon = PLATFORM_ICONS[m.platform] || "bi-globe";
+
                 const color = PLATFORM_COLORS[m.platform] || "#6c757d";
 
                 cardsHtml += `
+
                         <div class="col-md-6">
+
                             <div class="card h-100 shadow-sm border-0 bg-light">
+
                                 <div class="card-body">
+
                                     <div class="d-flex align-items-center gap-2 mb-3">
+
                                         <i class="bi ${icon} fs-4" style="color:${color}"></i>
+
                                         <h6 class="fw-bold text-capitalize mb-0">${escapeHtml(m.platform)}</h6>
+
                                         ${m.postUrl ? `<a href="${m.postUrl}" target="_blank" class="ms-auto btn btn-xs btn-outline-secondary py-0 px-2" style="font-size:0.75rem;">View Post</a>` : ''}
+
                                     </div>
+
                                     <div class="row g-2 text-center">
+
                                         <div class="col-4">
+
                                             <div class="p-2 bg-white rounded border">
+
                                                 <div class="text-muted small">Likes</div>
+
                                                 <div class="fw-bold fs-5 text-primary">${m.likes.toLocaleString()}</div>
+
                                             </div>
+
                                         </div>
+
                                         <div class="col-4">
+
                                             <div class="p-2 bg-white rounded border">
+
                                                 <div class="text-muted small">Comments</div>
+
                                                 <div class="fw-bold fs-5 text-success">${m.commentsCount.toLocaleString()}</div>
+
                                             </div>
+
                                         </div>
+
                                         <div class="col-4">
+
                                             <div class="p-2 bg-white rounded border">
+
                                                 <div class="text-muted small">Shares</div>
+
                                                 <div class="fw-bold fs-5 text-info">${m.shares.toLocaleString()}</div>
+
                                             </div>
+
                                         </div>
+
                                         ${m.impressions > 0 || m.reach > 0 ? `
+
                                             <div class="col-6 mt-2">
+
                                                 <div class="p-2 bg-white rounded border">
+
                                                     <div class="text-muted small">Impressions</div>
+
                                                     <div class="fw-bold fs-6 text-dark">${m.impressions.toLocaleString()}</div>
+
                                                 </div>
+
                                             </div>
+
                                             <div class="col-6 mt-2">
+
                                                 <div class="p-2 bg-white rounded border">
+
                                                     <div class="text-muted small">Reach / Visitors</div>
+
                                                     <div class="fw-bold fs-6 text-dark">${m.reach.toLocaleString()}</div>
+
                                                 </div>
+
                                             </div>
+
                                         ` : ''}
+
                                     </div>
+
                                     ${m.notes ? `<div class="alert alert-warning py-1 px-2 mt-2 mb-0 small">${(m.platform === "linkedin" && String(m.notes).includes("r_member_social"))
+
                         ? "LinkedIn analytics are not available yet. LinkedIn must approve extra access for this app first. The 0 values above are not real numbers."
+
                         : escapeHtml(m.notes)
+
                         }</div>` : ''}
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     `;
+
             });
 
             cardsHtml += `</div>`;
+
             container.innerHTML = cardsHtml;
+
         }
 
         // ============================================================
+
         // COMMENTS & ENGAGEMENT MANAGEMENT
+
         // ============================================================
+
         let currentPostForComments = null;
 
         async function showPostComments(postId) {
+
             currentPostForComments = postId;
+
             const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("commentsModal"));
+
             const container = document.getElementById("commentsContainer");
+
             container.innerHTML = `
+
                     <div class="text-center py-4">
+
                         <div class="spinner-border text-primary"></div>
+
                         <p class="text-muted mt-2">Loading live comments across platforms...</p>
+
                     </div>
+
                 `;
+
             modal.show();
 
             try {
+
                 const res = await fetch(`${API_ORIGIN}/api/social/engagement/posts/${postId}/comments`);
+
                 if (!res.ok) {
+
                     const err = await res.json().catch(() => ({}));
+
                     throw new Error(err.error || "Failed to load comments");
+
                 }
+
                 const comments = await res.json();
+
                 renderComments(comments, postId);
+
             } catch (err) {
+
                 container.innerHTML = `
+
                         <div class="alert alert-danger">
+
                             <i class="bi bi-exclamation-triangle-fill me-2"></i> ${escapeHtml(err.message)}
+
                         </div>
+
                     `;
+
             }
+
         }
 
         function renderComments(comments, postId) {
+
             const container = document.getElementById("commentsContainer");
+
             if (!comments || comments.length === 0) {
+
                 container.innerHTML = `
+
                         <div class="text-center py-4 text-muted">
+
                             <i class="bi bi-chat-square-dots fs-1 d-block mb-2 text-secondary"></i>
+
                             No comments found on this post yet.
+
                         </div>
+
                     `;
+
                 return;
+
             }
 
             let html = `<ul class="list-group list-group-flush">`;
 
             comments.forEach((c, idx) => {
+
                 const icon = PLATFORM_ICONS[c.platform] || "bi-globe";
+
                 const color = PLATFORM_COLORS[c.platform] || "#6c757d";
+
                 const created = c.createdTime ? new Date(c.createdTime).toLocaleString() : "";
 
                 html += `
+
                         <li class="list-group-item px-3 py-3">
+
                             <div class="d-flex justify-content-between align-items-start mb-1">
+
                                 <div class="d-flex align-items-center gap-2">
+
                                     <i class="bi ${icon} fs-5" style="color:${color}"></i>
+
                                     <span class="fw-bold">${escapeHtml(c.authorName)}</span>
+
                                     <span class="badge bg-light text-secondary border text-capitalize">${escapeHtml(c.platform)}</span>
+
                                 </div>
+
                                 <small class="text-muted">${created}</small>
+
                             </div>
+
                             <p class="mb-2 text-dark bg-light p-2 rounded">${escapeHtml(c.message)}</p>
 
                             <div class="d-flex align-items-center gap-3">
+
                                 ${c.likeCount > 0 ? `<small class="text-muted"><i class="bi bi-heart-fill text-danger me-1"></i>${c.likeCount}</small>` : ''}
+
                                 <button class="btn btn-sm btn-link p-0 text-decoration-none" onclick="toggleReplyBox('${c.commentId}')">
+
                                     <i class="bi bi-reply-fill"></i> Reply
+
                                 </button>
+
                             </div>
 
                             <!-- Inline Reply Box -->
+
                             <div id="replyBox_${c.commentId}" class="mt-2 d-none">
+
                                 <div class="input-group input-group-sm">
+
                                     <input type="text" class="form-control" id="replyInput_${c.commentId}" placeholder="Write a public reply...">
+
                                     <button class="btn btn-primary" onclick="sendReply('${c.commentId}', '${c.platform}', ${postId})">
+
                                         Send Reply
+
                                     </button>
+
                                 </div>
+
                             </div>
+
                         </li>
+
                     `;
+
             });
 
             html += `</ul>`;
+
             container.innerHTML = html;
+
         }
 
         function toggleReplyBox(commentId) {
+
             const box = document.getElementById(`replyBox_${commentId}`);
+
             if (box) {
+
                 box.classList.toggle("d-none");
+
                 if (!box.classList.contains("d-none")) {
+
                     document.getElementById(`replyInput_${commentId}`)?.focus();
+
                 }
+
             }
+
         }
 
         async function sendReply(commentId, platform, postId) {
+
             const input = document.getElementById(`replyInput_${commentId}`);
+
             const text = input?.value?.trim();
+
             if (!text) {
+
                 alert("Reply text cannot be empty.");
+
                 return;
+
             }
 
             try {
+
                 input.disabled = true;
+
                 const res = await fetch(`${API_ORIGIN}/api/social/engagement/comments/${encodeURIComponent(commentId)}/reply`, {
+
                     method: "POST",
+
                     headers: { "Content-Type": "application/json" },
+
                     body: JSON.stringify({ platform: platform, message: text })
+
                 });
 
                 const data = await res.json().catch(() => ({}));
+
                 if (!res.ok || !data.success) {
+
                     throw new Error(data.message || "Failed to post reply.");
+
                 }
 
                 alert("Reply posted successfully!");
+
                 input.value = "";
+
                 toggleReplyBox(commentId);
+
                 // Refresh comments
+
                 showPostComments(postId);
+
             } catch (err) {
+
                 alert("Error: " + err.message);
+
             } finally {
+
                 if (input) input.disabled = false;
+
             }
+
         }
+
         async function showBrandAnalytics() {
+
             if (!currentClientId) {
+
                 alert("Please select a brand/client first from the top-left dropdown.");
+
                 return;
+
             }
 
             const modal = new bootstrap.Modal(document.getElementById("brandAnalyticsModal"));
+
             const container = document.getElementById("brandAnalyticsContainer");
+
             const titleEl = document.getElementById("brandAnalyticsTitle");
-            
+
             let brandName = "Selected Brand";
+
             if (typeof currentClientList !== "undefined" && Array.isArray(currentClientList)) {
+
                 const activeBrand = currentClientList.find(c => c.id === currentClientId);
+
                 if (activeBrand) brandName = activeBrand.name || activeBrand.clientName || brandName;
+
             } else {
+
                 const sel = document.getElementById("clientWorkspaceSelect");
+
                 if (sel && sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]) {
+
                     brandName = sel.options[sel.selectedIndex].text.split("(")[0].trim();
+
                 }
+
             }
+
             titleEl.innerHTML = `<i class="bi bi-bar-chart-line-fill text-info fs-5 me-2"></i> ${escapeHtml(brandName)} — Organic & Paid Performance`;
 
             container.innerHTML = `
+
                 <div class="text-center py-5">
+
                     <div class="spinner-border text-primary" role="status"></div>
+
                     <p class="text-muted mt-2">Loading organic & paid advertising metrics...</p>
+
                 </div>
+
             `;
+
             modal.show();
 
             try {
+
                 const res = await fetch(`${API_ORIGIN}/api/social/analytics/brands/${currentClientId}`);
+
                 if (!res.ok) {
+
                     throw new Error(`Failed to load analytics: HTTP ${res.status}`);
+
                 }
+
                 const data = await res.json();
+
                 renderBrandAnalytics(data);
+
             } catch (err) {
+
                 container.innerHTML = `
+
                     <div class="alert alert-danger p-3 my-3">
+
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
                         Unable to load analytics: ${escapeHtml(err.message)}
+
                     </div>
+
                 `;
+
             }
+
         }
 
         function renderBrandAnalytics(data) {
+
             const container = document.getElementById("brandAnalyticsContainer");
+
             if (!data) {
+
                 container.innerHTML = `<p class="text-muted">No analytics data available.</p>`;
+
                 return;
+
             }
 
             // Platform summary cards
+
             let platformsHtml = "";
+
             (data.platforms || []).forEach(p => {
+
                 const icon = PLATFORM_ICONS[p.platform] || "bi-globe";
+
                 const color = PLATFORM_COLORS[p.platform] || "#4f46e5";
+
                 const badge = p.isConnected 
+
                     ? `<span class="badge bg-success-subtle text-success border border-success-subtle">Connected</span>` 
+
                     : `<span class="badge bg-secondary-subtle text-muted border border-secondary-subtle">Not Connected</span>`;
 
                 platformsHtml += `
+
                     <div class="col-md-4">
+
                         <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid ${color} !important;">
+
                             <div class="card-body">
+
                                 <div class="d-flex justify-content-between align-items-center mb-2">
+
                                     <div class="d-flex align-items-center gap-2">
+
                                         <i class="bi ${icon} fs-4" style="color: ${color}"></i>
+
                                         <h6 class="mb-0 fw-bold text-capitalize">${escapeHtml(p.platform)}</h6>
+
                                     </div>
+
                                     ${badge}
+
                                 </div>
+
                                 <div class="text-truncate text-muted small mb-3">
+
                                     ${escapeHtml(p.accountName || "No account linked")}
+
                                 </div>
+
                                 <div class="row g-2 text-center">
+
                                     <div class="col-4 bg-light p-2 rounded">
+
                                         <div class="fw-bold text-dark">${p.likes || 0}</div>
+
                                         <div class="text-muted" style="font-size: 11px;">Likes</div>
+
                                     </div>
+
                                     <div class="col-4 bg-light p-2 rounded">
+
                                         <div class="fw-bold text-dark">${p.commentsCount || 0}</div>
+
                                         <div class="text-muted" style="font-size: 11px;">Comments</div>
+
                                     </div>
+
                                     <div class="col-4 bg-light p-2 rounded">
+
                                         <div class="fw-bold text-dark">${p.shares || 0}</div>
+
                                         <div class="text-muted" style="font-size: 11px;">Shares</div>
+
                                     </div>
+
                                     <div class="col-6 bg-light p-2 rounded mt-2">
+
                                         <div class="fw-bold text-primary">${p.impressions || 0}</div>
+
                                         <div class="text-muted" style="font-size: 11px;">Impressions</div>
+
                                     </div>
+
                                     <div class="col-6 bg-light p-2 rounded mt-2">
+
                                         <div class="fw-bold text-success">${p.reach || 0}</div>
+
                                         <div class="text-muted" style="font-size: 11px;">Reach</div>
+
                                     </div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 `;
+
             });
 
             // Paid Ads rows
+
             let adsHtml = "";
+
             if (data.paidAdCampaigns && data.paidAdCampaigns.length > 0) {
+
                 data.paidAdCampaigns.forEach(ad => {
+
                     const icon = PLATFORM_ICONS[ad.platform] || "bi-globe";
+
                     const color = PLATFORM_COLORS[ad.platform] || "#4f46e5";
+
                     const statusClass = ad.status.toLowerCase() === "active" ? "bg-success" : "bg-secondary";
 
                     adsHtml += `
+
                         <tr>
+
                             <td class="fw-semibold">
+
                                 <div class="d-flex align-items-center gap-2">
+
                                     <i class="bi ${icon}" style="color: ${color}"></i>
+
                                     <span>${escapeHtml(ad.campaignName)}</span>
+
                                 </div>
+
                             </td>
+
                             <td><span class="badge ${statusClass}">${escapeHtml(ad.status)}</span></td>
+
                             <td class="fw-bold text-dark">$${Number(ad.spend || 0).toFixed(2)}</td>
+
                             <td>${Number(ad.impressions || 0).toLocaleString()}</td>
+
                             <td>${Number(ad.clicks || 0).toLocaleString()}</td>
+
                             <td>${Number(ad.ctr || 0).toFixed(2)}%</td>
+
                             <td>$${Number(ad.cpc || 0).toFixed(2)}</td>
+
                             <td><span class="badge bg-primary-subtle text-primary border border-primary-subtle">${ad.leads || 0}</span></td>
+
                             <td>${ad.conversions || 0}</td>
+
                             <td class="fw-bold text-success">${Number(ad.roas || 0).toFixed(2)}x</td>
+
                         </tr>
+
                     `;
+
                 });
+
             } else {
+
                 adsHtml = `
+
                     <tr>
+
                         <td colspan="10" class="text-center py-4 text-muted">
+
                             <i class="bi bi- megaphone fs-3 d-block mb-1 text-secondary"></i>
+
                             No paid advertising campaigns connected for this brand yet.
+
                         </td>
+
                     </tr>
+
                 `;
+
             }
 
             container.innerHTML = `
+
                 <!-- EXECUTIVE METRICS -->
+
                 <div class="row g-3 mb-4">
+
                     <div class="col-md-3">
+
                         <div class="card border-0 shadow-sm p-3 bg-white">
+
                             <div class="d-flex align-items-center justify-content-between">
+
                                 <div>
+
                                     <div class="text-muted small fw-semibold">TOTAL IMPRESSIONS</div>
+
                                     <div class="fs-4 fw-bold text-primary mt-1">${Number(data.totalImpressions || 0).toLocaleString()}</div>
+
                                 </div>
+
                                 <div class="bg-primary-subtle text-primary p-2 rounded-3">
+
                                     <i class="bi bi-eye-fill fs-4"></i>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                     <div class="col-md-3">
+
                         <div class="card border-0 shadow-sm p-3 bg-white">
+
                             <div class="d-flex align-items-center justify-content-between">
+
                                 <div>
+
                                     <div class="text-muted small fw-semibold">TOTAL REACH</div>
+
                                     <div class="fs-4 fw-bold text-success mt-1">${Number(data.totalReach || 0).toLocaleString()}</div>
+
                                 </div>
+
                                 <div class="bg-success-subtle text-success p-2 rounded-3">
+
                                     <i class="bi bi-people-fill fs-4"></i>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                     <div class="col-md-3">
+
                         <div class="card border-0 shadow-sm p-3 bg-white">
+
                             <div class="d-flex align-items-center justify-content-between">
+
                                 <div>
+
                                     <div class="text-muted small fw-semibold">TOTAL ENGAGEMENT</div>
+
                                     <div class="fs-4 fw-bold text-warning-emphasis mt-1">${Number(data.totalEngagement || 0).toLocaleString()}</div>
+
                                 </div>
+
                                 <div class="bg-warning-subtle text-warning-emphasis p-2 rounded-3">
+
                                     <i class="bi bi-heart-pulse-fill fs-4"></i>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                     <div class="col-md-3">
+
                         <div class="card border-0 shadow-sm p-3 bg-white">
+
                             <div class="d-flex align-items-center justify-content-between">
+
                                 <div>
+
                                     <div class="text-muted small fw-semibold">PUBLISHED POSTS</div>
+
                                     <div class="fs-4 fw-bold text-info-emphasis mt-1">${data.publishedPosts || 0}</div>
+
                                 </div>
+
                                 <div class="bg-info-subtle text-info-emphasis p-2 rounded-3">
+
                                     <i class="bi bi-send-check-fill fs-4"></i>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
 
                 <!-- PLATFORM BREAKDOWN -->
+
                 <div class="mb-4">
+
                     <h6 class="fw-bold text-dark mb-3">
+
                         <i class="bi bi-diagram-3-fill text-primary me-2"></i>
+
                         Core Social Networks (Facebook, Instagram, LinkedIn)
+
                     </h6>
+
                     <div class="row g-3">
+
                         ${platformsHtml}
+
                     </div>
+
                 </div>
 
                 <!-- PAID ADVERTISING CAMPAIGNS -->
+
                 <div class="card border-0 shadow-sm">
+
                     <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+
                         <h6 class="fw-bold text-dark mb-0">
+
                             <i class="bi bi-currency-dollar text-success me-2"></i>
+
                             Paid Advertising Insights (Meta & Google Ads)
+
                         </h6>
+
                         <span class="badge bg-secondary-subtle text-secondary border">Read-Only Campaign Sync</span>
+
                     </div>
+
                     <div class="table-responsive">
+
                         <table class="table table-hover align-middle mb-0">
+
                             <thead class="table-light small text-uppercase text-muted">
+
                                 <tr>
+
                                     <th>Campaign</th>
+
                                     <th>Status</th>
+
                                     <th>Spend</th>
+
                                     <th>Impressions</th>
+
                                     <th>Clicks</th>
+
                                     <th>CTR</th>
+
                                     <th>CPC</th>
+
                                     <th>Leads</th>
+
                                     <th>Conversions</th>
+
                                     <th>ROAS</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 ${adsHtml}
+
                             </tbody>
-                        </table>
+
+                        </table>\n                    </div>\n                </div>
+
+                <!-- GOOGLE ADS SECTION -->
+
+                <hr class="my-4">
+
+                <div class="mb-4" id="googleAdsSectionContainer">
+
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+
+                        <h6 class="fw-bold text-dark mb-0">
+
+                            <i class="bi bi-google text-danger me-2 fs-5"></i>
+
+                            Google Ads — Paid Advertising
+
+                        </h6>
+
+                        <div id="googleAdsActionBtn"></div>
+
                     </div>
+
+                    <div id="googleAdsContent">
+
+                        <div class="text-center py-3">
+
+                            <div class="spinner-border spinner-border-sm text-secondary"></div>
+
+                            <span class="text-muted ms-2 small">Loading Google Ads data...</span>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             `;
+
+            setTimeout(function() { if (typeof loadGoogleAdsSection === 'function') loadGoogleAdsSection(); }, 100);
+
         }
 
         // ============================================================
+
         // APPROVAL & INVITATION WORKFLOW HELPERS
+
         // ============================================================
+
         function toggleApprovalOptions() {
+
             const isApproval = document.getElementById("approvalToggle")?.checked;
+
             const noteGroup = document.getElementById("approvalNoteGroup");
+
             const publishBtn = document.getElementById("publishBtn");
+
             const publishBtnText = document.getElementById("publishBtnText");
 
             if (isApproval) {
+
                 noteGroup?.classList.remove("d-none");
+
                 if (publishBtnText) publishBtnText.innerText = "Submit for Approval";
+
                 publishBtn?.classList.remove("btn-success");
+
                 publishBtn?.classList.add("btn-warning");
+
             } else {
+
                 noteGroup?.classList.add("d-none");
+
                 const isScheduled = document.getElementById("scheduleToggle")?.checked;
+
                 if (publishBtnText) publishBtnText.innerText = isScheduled ? "Schedule Post" : "Publish Now";
+
                 publishBtn?.classList.remove("btn-warning");
+
                 publishBtn?.classList.add("btn-success");
+
             }
+
         }
 
         function openInviteClientModal() {
+
             if (!currentClientId) {
+
                 alert("Please select a brand/client workspace first from the top-left dropdown.");
+
                 return;
+
             }
 
             let brandName = "Selected Brand";
+
             if (typeof currentClientList !== "undefined" && Array.isArray(currentClientList)) {
+
                 const activeBrand = currentClientList.find(c => c.id === currentClientId);
+
                 if (activeBrand) brandName = activeBrand.name || activeBrand.clientName || brandName;
+
             } else {
+
                 const sel = document.getElementById("clientWorkspaceSelect");
+
                 if (sel && sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]) {
+
                     brandName = sel.options[sel.selectedIndex].text.split("(")[0].trim();
+
                 }
+
             }
 
             const labelEl = document.getElementById("inviteBrandName");
+
             if (labelEl) labelEl.innerText = brandName;
 
             // Hide previous results
+
             document.getElementById("inviteResultArea")?.classList.add("d-none");
 
+            loadBrandInvitations();
+
             const modal = new bootstrap.Modal(document.getElementById("inviteClientModal"));
+
             modal.show();
+
+        }
+
+        async function loadBrandInvitations() {
+
+            if (!currentClientId) return;
+
+            const container = document.getElementById("brandInvitationsList");
+
+            if (!container) return;
+
+            try {
+
+                const res = await fetch(`${API_BASE}/invitations/brand/${currentClientId}`);
+
+                if (!res.ok) throw new Error("Failed to load invitations");
+
+                const items = await res.json();
+
+                if (!items || items.length === 0) {
+
+                    container.innerHTML = `
+
+                        <div class="text-center py-4 text-muted">
+
+                            <i class="bi bi-inbox fs-2 d-block mb-1 text-secondary"></i>
+
+                            No invitation links created yet for this brand.
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+                let html = `
+
+                    <div class="table-responsive">
+
+                        <table class="table table-sm align-middle mb-0">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Recipient</th>
+
+                                    <th>Created</th>
+
+                                    <th>Expires</th>
+
+                                    <th>Status</th>
+
+                                    <th>Actions</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                `;
+
+                items.forEach(inv => {
+
+                    const statusBadge = inv.isExpired 
+
+                        ? `<span class="badge bg-secondary">Expired</span>`
+
+                        : `<span class="badge bg-success">Active</span>`;
+
+                    const linkUrl = `${window.location.origin}/connect-client.html?token=${inv.token}`;
+
+                    html += `
+
+                        <tr>
+
+                            <td>
+
+                                <div class="fw-semibold text-dark">${escapeHtml(inv.recipientName || "Client Contact")}</div>
+
+                                <small class="text-muted">${escapeHtml(inv.recipientEmail || "No email specified")}</small>
+
+                            </td>
+
+                            <td>${new Date(inv.createdAt).toLocaleDateString()}</td>
+
+                            <td>${new Date(inv.expiresAt).toLocaleDateString()}</td>
+
+                            <td>${statusBadge}</td>
+
+                            <td>
+
+                                <div class="d-flex gap-1">
+
+                                    <button class="btn btn-xs btn-outline-primary btn-sm" onclick="navigator.clipboard.writeText('${linkUrl}').then(() => alert('Link copied to clipboard!'))" title="Copy Link">
+
+                                        <i class="bi bi-clipboard"></i>
+
+                                    </button>
+
+                                    <a href="${linkUrl}" target="_blank" class="btn btn-xs btn-outline-secondary btn-sm" title="Open Link">
+
+                                        <i class="bi bi-box-arrow-up-right"></i>
+
+                                    </a>
+
+                                    <button class="btn btn-xs btn-outline-danger btn-sm" onclick="revokeInvitation(${inv.id})" title="Revoke Link">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                });
+
+                html += `</tbody></table></div>`;
+
+                container.innerHTML = html;
+
+            } catch (e) {
+
+                container.innerHTML = `<div class="text-danger small">Error loading invitations: ${escapeHtml(e.message)}</div>`;
+
+            }
+
+        }
+
+        async function revokeInvitation(invId) {
+
+            if (!confirm("Are you sure you want to revoke this invitation link?")) return;
+
+            try {
+
+                const res = await fetch(`${API_BASE}/invitations/${invId}`, { method: "DELETE" });
+
+                if (res.ok) {
+
+                    loadBrandInvitations();
+
+                } else {
+
+                    alert("Failed to revoke invitation.");
+
+                }
+
+            } catch (err) {
+
+                alert("Error: " + err.message);
+
+            }
+
         }
 
         async function generateClientInviteLink() {
+
             if (!currentClientId) {
+
                 alert("No brand selected.");
+
                 return;
+
             }
 
             const contactName = document.getElementById("inviteClientContactName")?.value?.trim();
+
             const email = document.getElementById("inviteClientEmail")?.value?.trim();
+
             const msg = document.getElementById("inviteClientMsg")?.value?.trim();
 
             try {
+
                 const res = await fetch(`${API_BASE}/invitations`, {
+
                     method: "POST",
+
                     headers: { "Content-Type": "application/json" },
+
                     body: JSON.stringify({
+
                         clientId: currentClientId,
+
                         recipientName: contactName,
+
                         recipientEmail: email,
+
                         message: msg
+
                     })
+
                 });
 
                 const data = await res.json();
+
                 if (!res.ok) throw new Error(data.error || "Failed to generate connection link.");
 
                 const inputUrl = document.getElementById("generatedInviteUrl");
+
                 const openBtn = document.getElementById("openInviteLinkBtn");
+
                 if (inputUrl) inputUrl.value = data.connectionUrl;
+
                 if (openBtn) openBtn.href = data.connectionUrl;
 
                 document.getElementById("inviteResultArea")?.classList.remove("d-none");
+
             } catch (err) {
+
                 alert("Error: " + err.message);
+
             }
+
         }
 
         function copyInviteLink() {
-            const input = document.getElementById("generatedInviteUrl");
-            if (!input || !input.value) return;
-            navigator.clipboard.writeText(input.value).then(() => {
-                alert("Connection link copied to clipboard!");
-            }).catch(() => {
-                input.select();
-                document.execCommand("copy");
-                alert("Connection link copied!");
-            });
-        }
-    </script>
 
+            const input = document.getElementById("generatedInviteUrl");
+
+            if (!input || !input.value) return;
+
+            navigator.clipboard.writeText(input.value).then(() => {
+
+                alert("Connection link copied to clipboard!");
+
+            }).catch(() => {
+
+                input.select();
+
+                document.execCommand("copy");
+
+                alert("Connection link copied!");
+
+            });
+
+        }
+
+    </script>
 
     <script src="accounts-ui.js"></script>
 
+    <script src="google-ads.js"></script>
 
 </body>
+
 </html>

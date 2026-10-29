@@ -12,6 +12,7 @@
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
+    <PackageReference Include="Google.Ads.GoogleAds" Version="27.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
@@ -22,7 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
     <PackageReference Include="PDFtoImage" Version="5.4.0" />

@@ -73,15 +73,18 @@ namespace SocialPublisher.API.Controllers
                 client.TimeZone,
                 client.IsActive,
                 client.CreatedAt,
-                Accounts = client.Accounts.Select(a => new
-                {
-                    a.Id,
-                    a.Platform,
-                    a.AccountName,
-                    a.ExternalAccountId,
-                    a.IsConnected,
-                    a.AvatarUrl
-                })
+                Accounts = client.Accounts
+                    .OrderByDescending(a => a.IsConnected)
+                    .ThenByDescending(a => a.Id)
+                    .Select(a => new
+                    {
+                        a.Id,
+                        a.Platform,
+                        a.AccountName,
+                        a.ExternalAccountId,
+                        a.IsConnected,
+                        a.AvatarUrl
+                    })
             });
         }
 

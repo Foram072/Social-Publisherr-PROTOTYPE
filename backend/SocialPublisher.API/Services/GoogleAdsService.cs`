@@ -1,0 +1,32 @@
+        public async Task<IReadOnlyList<(long CampaignId, string CampaignName)>> ListCampaignsAsync(
+            string encryptedRefreshToken,
+            long loginCustomerId,
+            long customerId)
+        {
+            var client = BuildClient(encryptedRefreshToken, loginCustomerId);
+            var googleAdsService = client.GetService(
+                Google.Ads.GoogleAds.V11.Services.GoogleAdsService);
+
+            const string query = "SELECT campaign.id, campaign.name FROM campaign WHERE campaign.status = ENABLED";
+            var resultList = new List<(long CampaignId, string CampaignName)>();
+
+            try
+            {
+                await googleAdsService.SearchStreamAsync(
+                    customerId.ToString(),
+                    query,
+                    response =>
+                    {
+                        foreach (var row in response.Results)
+                        {
+                            resultList.Add((row.Campaign.Id, row.Campaign.Name));
+                        }
+                    });
+            }
+            catch (GoogleAdsException ex)
+            {
+                throw new InvalidOperationException($"Google Ads API error: {ex.Message}", ex);
+            }
+
+            return resultList;
+        }

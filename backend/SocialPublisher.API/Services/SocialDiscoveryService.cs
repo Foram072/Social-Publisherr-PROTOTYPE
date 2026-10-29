@@ -66,6 +66,14 @@ namespace SocialPublisher.API.Services
                     await DiscoverPinterestAssetsAsync(connection, response, existingAccounts);
                     break;
 
+                case "youtube":
+                    await DiscoverYouTubeAssetsAsync(connection, response, existingAccounts);
+                    break;
+
+                case "x":
+                    await DiscoverXAssetsAsync(connection, response, existingAccounts);
+                    break;
+
                 default:
                     _logger.LogWarning("Provider {Provider} does not support asset discovery yet", connection.Provider);
                     break;
@@ -350,6 +358,134 @@ namespace SocialPublisher.API.Services
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Could not discover Pinterest boards");
+            }
+        }
+
+        private async Task DiscoverYouTubeAssetsAsync(
+            SocialConnection connection,
+            OAuthDiscoveryResponseDto response,
+            List<SocialAccount> existingAccounts)
+        {
+            var client = _httpClientFactory.CreateClient();
+
+            try
+            {
+                // GET https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&mine=true
+                using var req = new HttpRequestMessage(HttpMethod.Get, "https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&mine=true");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", connection.AccessToken);
+
+                var res = await client.SendAsync(req);
+                var content = await res.Content.ReadAsStringAsync();
+
+                if (res.IsSuccessStatusCode)
+                {
+                    using var doc = JsonDocument.Parse(content);
+                    if (doc.RootElement.TryGetProperty("items", out var items) && items.GetArrayLength() > 0)
+                    {
+                        foreach (var item in items.EnumerateArray())
+                        {
+                            var channelId = item.TryGetProperty("id", out var idProp) ? idProp.GetString() : null;
+                            if (string.IsNullOrEmpty(channelId)) continue;
+
+                            string channelTitle = "YouTube Channel";
+                            string? avatarUrl = null;
+
+                            if (item.TryGetProperty("snippet", out var snippet))
+                            {
+                                if (snippet.TryGetProperty("title", out var titleProp))
+                                    channelTitle = titleProp.GetString() ?? channelTitle;
+
+                                if (snippet.TryGetProperty("thumbnails", out var thumbs))
+                                {
+                                    if (thumbs.TryGetProperty("default", out var defThumb) && defThumb.TryGetProperty("url", out var u))
+                                        avatarUrl = u.GetString();
+                                    else if (thumbs.TryGetProperty("medium", out var medThumb) && medThumb.TryGetProperty("url", out var mu))
+                                        avatarUrl = mu.GetString();
+                                }
+                            }
+
+                            var existing = existingAccounts.Find(a => a.Platform == "youtube" && a.ExternalAccountId == channelId);
+
+                            response.DiscoveredAssets.Add(new DiscoveredSocialAssetDto
+                            {
+                                Platform = "youtube",
+                                ExternalId = channelId,
+                                Name = $"{channelTitle} (Channel)",
+                                Category = "YouTube Channel",
+                                AvatarUrl = avatarUrl,
+                                AccessToken = connection.AccessToken,
+                                IsAlreadyConnected = existing != null,
+                                ConnectedClientId = existing?.ClientId,
+                                ConnectedClientName = existing?.Client?.Name
+                            });
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("No YouTube channels found for the authenticated Google account.");
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("YouTube channels fetch returned {Status}: {Content}", (int)res.StatusCode, content);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not discover YouTube channels");
+            }
+        }
+
+        private async Task DiscoverXAssetsAsync(
+            SocialConnection connection,
+            OAuthDiscoveryResponseDto response,
+            List<SocialAccount> existingAccounts)
+        {
+            var client = _httpClientFactory.CreateClient();
+            try
+            {
+                using var req = new HttpRequestMessage(HttpMethod.Get, "https://api.twitter.com/2/users/me?user.fields=profile_image_url,name,username");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", connection.AccessToken);
+
+                var res = await client.SendAsync(req);
+                var content = await res.Content.ReadAsStringAsync();
+
+                if (res.IsSuccessStatusCode)
+                {
+                    using var doc = JsonDocument.Parse(content);
+                    if (doc.RootElement.TryGetProperty("data", out var data))
+                    {
+                        var userId = data.GetProperty("id").GetString()!;
+                        var username = data.GetProperty("username").GetString()!;
+                        var name = data.TryGetProperty("name", out var nProp) ? nProp.GetString() : username;
+                        var avatarUrl = data.TryGetProperty("profile_image_url", out var pProp) ? pProp.GetString() : null;
+
+                        response.ProviderUserName = $"@{username}";
+
+                        var existing = existingAccounts.Find(a => a.Platform == "x" && a.ExternalAccountId == userId);
+
+                        response.DiscoveredAssets.Add(new DiscoveredSocialAssetDto
+                        {
+                            Platform = "x",
+                            ExternalId = userId,
+                            Name = $"@{username} ({name})",
+                            Category = "X Account",
+                            AvatarUrl = avatarUrl,
+                            AccessToken = connection.AccessToken,
+                            IsAlreadyConnected = existing != null,
+                            ConnectedClientId = existing?.ClientId,
+                            ConnectedClientName = existing?.Client?.Name
+                        });
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("X users/me fetch returned {Status}: {Content}", (int)res.StatusCode, content);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not discover X account profile");
             }
         }
 

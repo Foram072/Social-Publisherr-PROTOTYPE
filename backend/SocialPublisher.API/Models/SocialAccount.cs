@@ -5,6 +5,9 @@ namespace SocialPublisher.API.Models
 {
     public class SocialAccount
     {
+        // Platform identifiers for clarity
+        public const string PlatformGoogleAds = "GoogleAds";
+
         [Key]
         public int Id { get; set; }
         public string Platform { get; set; } = string.Empty; // e.g. facebook, instagram, linkedin
@@ -20,6 +23,12 @@ namespace SocialPublisher.API.Models
         // Long-lived refresh token (LinkedIn provides one; Facebook uses long-lived tokens)
         public string? RefreshToken { get; set; }
 
+        // ── Google Ads specific fields ────────────────────────────────────────
+        // Refresh token for Google Ads (encrypted via TokenProtector)
+        public string? GoogleAdsRefreshToken { get; set; }
+        // Numeric Google Ads Customer Id (the Ads account identifier)
+        public long? GoogleAdsCustomerId { get; set; }
+
         // ── Multi-tenant / Agency Client & OAuth Connection associations ──
         public int? ClientId { get; set; }
         public SocialClient? Client { get; set; }
@@ -33,4 +42,3 @@ namespace SocialPublisher.API.Models
         public ICollection<SocialPostPublish> PublishResults { get; set; } = new List<SocialPostPublish>();
     }
 }
-

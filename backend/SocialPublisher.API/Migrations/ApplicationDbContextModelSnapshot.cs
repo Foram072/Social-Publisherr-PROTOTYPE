@@ -69,7 +69,59 @@ namespace SocialPublisher.API.Migrations
 
                     b.HasIndex("ClientId");
 
+                    b.HasIndex("Token")
+                        .IsUnique();
+
                     b.ToTable("ClientConnectionInvitations");
+                });
+
+            modelBuilder.Entity("SocialPublisher.API.Models.GoogleAdsAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsConnected")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("TokenExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId", "CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("GoogleAdsAccounts");
                 });
 
             modelBuilder.Entity("SocialPublisher.API.Models.Organization", b =>
@@ -130,6 +182,12 @@ namespace SocialPublisher.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("GoogleAdsCustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("GoogleAdsRefreshToken")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsConnected")
                         .HasColumnType("boolean");
 
@@ -148,9 +206,9 @@ namespace SocialPublisher.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
-
                     b.HasIndex("ConnectionId");
+
+                    b.HasIndex("ClientId", "Platform");
 
                     b.ToTable("SocialAccounts");
                 });
@@ -247,7 +305,7 @@ namespace SocialPublisher.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("ClientId", "Provider");
 
                     b.ToTable("SocialConnections");
                 });
@@ -287,6 +345,10 @@ namespace SocialPublisher.API.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
+
+                    b.HasIndex("ScheduledAt");
+
+                    b.HasIndex("Status");
 
                     b.ToTable("SocialPosts");
                 });
@@ -385,9 +447,9 @@ namespace SocialPublisher.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
-
                     b.HasIndex("SocialAccountId");
+
+                    b.HasIndex("PostId", "SocialAccountId");
 
                     b.ToTable("SocialPostPublishes");
                 });
@@ -432,12 +494,26 @@ namespace SocialPublisher.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("Users");
                 });
 
             modelBuilder.Entity("SocialPublisher.API.Models.ClientConnectionInvitation", b =>
+                {
+                    b.HasOne("SocialPublisher.API.Models.SocialClient", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("SocialPublisher.API.Models.GoogleAdsAccount", b =>
                 {
                     b.HasOne("SocialPublisher.API.Models.SocialClient", "Client")
                         .WithMany()

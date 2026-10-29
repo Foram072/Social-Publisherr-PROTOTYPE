@@ -165,7 +165,6 @@
 .wz-progress-x { border: 0; background: none; font-size: 1.3rem; line-height: 1; color: #888; cursor: pointer; padding: 0 2px; }
 .wz-progress-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: .92rem; }
 .wz-progress-state { width: 20px; display: inline-flex; justify-content: center; }
-
 `;
     document.head.appendChild(style);
 })();
@@ -201,16 +200,24 @@ async function _initApp() {
 
 function initAuthSession() {
     try {
-        const stored = localStorage.getItem("wiseliy_user");
+        const stored = sessionStorage.getItem("wiseliy_user");
         if (stored) {
             currentUser = JSON.parse(stored);
             renderAuthHeader();
+        } else {
+            // Not authenticated: strictly redirect to /login
+            currentUser = null;
+            window.location.replace("/login");
+            return;
         }
-        const savedClientId = localStorage.getItem("wiseliy_client_id");
+        const savedClientId = sessionStorage.getItem("wiseliy_client_id");
         if (savedClientId) {
             currentClientId = parseInt(savedClientId, 10);
         }
-    } catch (e) { console.warn("initAuthSession error:", e); }
+    } catch (e) {
+        console.warn("initAuthSession error:", e);
+        window.location.replace("/login");
+    }
 }
 
 function renderAuthHeader() {
@@ -222,25 +229,19 @@ function renderAuthHeader() {
             <div class="dropdown">
                 <button class="btn btn-sm btn-outline-light dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
                     <i class="bi bi-person-circle text-info"></i>
-                    <span>${escapeHtml(currentUser.fullName)}</span>
+                    <span>${escapeHtml(currentUser.fullName || currentUser.email)}</span>
                     <span class="badge bg-secondary">${escapeHtml(currentUser.role || 'Owner')}</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                    <li><span class="dropdown-item-text small" style="color:#ccc;font-size:12px;padding:4px 16px;display:block;">${escapeHtml(currentUser.email)}</span></li>
+                    <li><span class="dropdown-item-text small" style="color:#ccc;font-size:12px;padding:4px 16px;display:block;">${escapeHtml(currentUser.email || '')}</span></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="logoutUser()"><i class="bi bi-box-arrow-right"></i> Log out</a></li>
                 </ul>
             </div>
         `;
     } else {
-        container.innerHTML = `
-            <a href="/login" class="btn btn-sm btn-outline-info">
-                <i class="bi bi-box-arrow-in-right"></i> Log in
-            </a>
-            <a href="/signup" class="btn btn-sm btn-primary">
-                Sign up for free
-            </a>
-        `;
+        // Not logged in: Redirect immediately to /login
+        window.location.replace("/login");
     }
 }
 
@@ -281,8 +282,8 @@ async function submitSignup() {
         if (!res.ok) throw new Error(data.error || "Signup failed.");
 
         currentUser = data.user;
-        localStorage.setItem("wiseliy_user", JSON.stringify(data.user));
-        if (data.token) localStorage.setItem("wiseliy_token", data.token);
+        sessionStorage.setItem("wiseliy_user", JSON.stringify(data.user));
+        if (data.token) sessionStorage.setItem("wiseliy_token", data.token);
         renderAuthHeader();
 
         // Close modal
@@ -293,7 +294,7 @@ async function submitSignup() {
             currentClientId = data.activeBrand.id;
         }
 
-        alert(`Welcome to Wiseliy Social, ${data.user.fullName}!\nYour organization "${data.organization.name}" is ready.`);
+        alert(`Welcome to Social Wise, ${data.user.fullName}!\nYour organization "${data.organization.name}" is ready.`);
         await loadClientWorkspaces();
     } catch (err) {
         alert("Signup Error: " + err.message);
@@ -320,8 +321,8 @@ async function submitLogin() {
         if (!res.ok) throw new Error(data.error || "Login failed.");
 
         currentUser = data.user;
-        localStorage.setItem("wiseliy_user", JSON.stringify(data.user));
-        if (data.token) localStorage.setItem("wiseliy_token", data.token);
+        sessionStorage.setItem("wiseliy_user", JSON.stringify(data.user));
+        if (data.token) sessionStorage.setItem("wiseliy_token", data.token);
         renderAuthHeader();
 
         // Close modal
@@ -341,10 +342,10 @@ async function submitLogin() {
 
 function logoutUser() {
     currentUser = null;
-    localStorage.removeItem("wiseliy_user");
-    localStorage.removeItem("wiseliy_token");
-    localStorage.removeItem("wiseliy_client_id");
-    window.location.href = "login.html";
+    sessionStorage.removeItem("wiseliy_user");
+    sessionStorage.removeItem("wiseliy_token");
+    sessionStorage.removeItem("wiseliy_client_id");
+    window.location.replace("/login");
 }
 
 async function loadClientWorkspaces() {
@@ -383,7 +384,7 @@ async function onWorkspaceChanged() {
     const select = document.getElementById("clientWorkspaceSelect");
     if (!select) return;
     currentClientId = select.value ? parseInt(select.value, 10) : null;
-    try { if (currentClientId) localStorage.setItem("wiseliy_client_id", String(currentClientId)); } catch (e) { }
+    try { if (currentClientId) sessionStorage.setItem("wiseliy_client_id", String(currentClientId)); } catch (e) { }
     await loadAccounts();
 }
 
@@ -454,8 +455,8 @@ const BRAND_NETWORKS = [
     { id: "instagram", label: "Instagram", icon: "bi-instagram", color: "#e1306c", enabled: true },
     { id: "linkedin", label: "LinkedIn", icon: "bi-linkedin", color: "#0a66c2", enabled: true },
     { id: "pinterest", label: "Pinterest", icon: "bi-pinterest", color: "#e60023", enabled: true },
-    { id: "twitter", label: "X", icon: "bi-twitter-x", color: "#111111", enabled: false },
-    { id: "youtube", label: "YouTube", icon: "bi-youtube", color: "#ff0000", enabled: false }
+    { id: "youtube", label: "YouTube", icon: "bi-youtube", color: "#ff0000", enabled: true },
+    { id: "x", label: "X", icon: "bi-twitter-x", color: "#111111", enabled: true }
 ];
 
 const NETWORK_TEXT = {
@@ -478,6 +479,16 @@ const NETWORK_TEXT = {
         noun: "Pinterest Board / Account",
         connect: "Connect your Pinterest account to publish Pins to your boards.",
         pick: "Add a Board or Account associated with this Pinterest account:"
+    },
+    youtube: {
+        noun: "YouTube Channel",
+        connect: "Connect your Google account with YouTube Data API access to upload videos to your Channel.",
+        pick: "Add a YouTube Channel associated with this Google account:"
+    },
+    x: {
+        noun: "X (Twitter) Profile",
+        connect: "Connect your X (Twitter) account to publish tweets directly to your timeline.",
+        pick: "Add an X account associated with this login:"
     }
 };
 
@@ -657,13 +668,14 @@ function maybeAutoOpenBrandSetup(connectedCount) {
 // Load Accounts for Active Client Workspace
 // ────────────────────────────────────────────────────────────────────────────
 function resolveAccountInfo(platform, clientAcc, baseAcc) {
-    const src = clientAcc || baseAcc || null;
+    // When a Brand Workspace is active, ONLY consider accounts connected to that workspace
+    const src = currentClientId ? (clientAcc || null) : (baseAcc || null);
     return {
         isConnected: src ? !!src.isConnected : false,
-        accountName: src ? (src.accountName || `${platform} Account`) : `${platform} Account`,
+        accountName: src ? (src.accountName || (platform + " Account")) : (platform + " Account"),
         accId: src ? src.id : null,
-        avatar: (clientAcc && clientAcc.avatarUrl) || null,
-        status: (clientAcc && clientAcc.status) || (baseAcc && baseAcc.status) || null
+        avatar: (src && src.avatarUrl) || null,
+        status: (src && src.status) || (src && src.isConnected ? "Connected" : "NotConnected")
     };
 }
 
@@ -682,17 +694,21 @@ async function loadAccounts() {
             }
         }
 
-        const res = await fetch(`${API_BASE}/accounts`);
-        if (!res.ok) throw new Error("API returned " + res.status);
-        const baseAccounts = await res.json();
+        let baseAccounts = [];
+        if (!currentClientId) {
+            const res = await fetch(`${API_BASE}/accounts`);
+            if (res.ok) baseAccounts = await res.json();
+        }
 
-        const platforms = ["facebook", "instagram", "linkedin", "pinterest"];
+        const platforms = ["facebook", "instagram", "linkedin", "pinterest", "youtube", "x"];
         brandAccountsState = {};
         let connectedCount = 0;
 
         const rowsHtml = platforms.map(p => {
-            const clientAcc = clientAccounts.find(a => a.platform.toLowerCase() === p);
-            const baseAcc = baseAccounts.find(a => a.platform.toLowerCase() === p);
+            const clientAcc = clientAccounts.find(a => a.platform.toLowerCase() === p && a.isConnected)
+                || clientAccounts.find(a => a.platform.toLowerCase() === p);
+            const baseAcc = baseAccounts.find(a => a.platform.toLowerCase() === p && a.isConnected)
+                || baseAccounts.find(a => a.platform.toLowerCase() === p);
             const info = resolveAccountInfo(p, clientAcc, baseAcc);
 
             brandAccountsState[p] = { isConnected: info.isConnected, name: info.accountName, avatar: info.avatar, status: info.status };
@@ -702,6 +718,19 @@ async function loadAccounts() {
         }).join("");
 
         container.innerHTML = rowsHtml + renderAddChannelsStrip();
+
+        // Keep workspace dropdown badge in sync with real-time connected count
+        if (currentClientId) {
+            const select = document.getElementById("clientWorkspaceSelect");
+            if (select) {
+                const opt = select.querySelector(`option[value="${currentClientId}"]`);
+                if (opt) {
+                    const clientObj = currentClientList.find(c => c.id == currentClientId);
+                    const clientName = clientObj ? clientObj.name : opt.textContent.replace(/\s*\(.*\)$/, '').trim();
+                    opt.textContent = `${clientName} (${connectedCount} connected)`;
+                }
+            }
+        }
 
         refreshBrandSetupTabs();
         maybeAutoOpenBrandSetup(connectedCount);
@@ -825,6 +854,9 @@ function connectPlatform(platform, opts) {
         `Connect ${platform}`,
         "width=650,height=720,scrollbars=yes,resizable=yes"
     );
+
+    // X blocks the popup from talking to this page, so ask the server instead.
+    if (platform === "x") waitForOAuthResult("x");
 
     const timer = setInterval(() => {
         if (popup && popup.closed) {
@@ -1061,13 +1093,60 @@ document.addEventListener("click", async function (event) {
     }
 });
 
+// ────────────────────────────────────────────────────────────────────────────
+// X login result (X blocks popup messages, so we use the server + localStorage)
+// ────────────────────────────────────────────────────────────────────────────
+let lastOAuthHandledAt = 0;
+
+function handleOAuthResult(data) {
+    if (Date.now() - lastOAuthHandledAt < 8000) return;   // never open the window twice
+    lastOAuthHandledAt = Date.now();
+
+    if (data.success && data.connectionId) {
+        openDiscoveryModal(data.connectionId, data.clientId || currentClientId);
+    } else {
+        loadAccounts();
+        loadClientWorkspaces();
+    }
+}
+
+function waitForOAuthResult(platform) {
+    const started = Date.now();
+    const timer = setInterval(async () => {
+        if (Date.now() - started > 180000) { clearInterval(timer); return; }   // give up after 3 min
+        try {
+            const res = await fetch(`${API_BASE}/accounts/oauth-result/${encodeURIComponent(platform)}`);
+            if (!res.ok) return;
+            const r = await res.json();
+            if (r.ready) {
+                clearInterval(timer);
+                handleOAuthResult({ success: true, connectionId: r.connectionId, clientId: r.clientId });
+            }
+        } catch (e) { /* try again in 2 seconds */ }
+    }, 2000);
+}
+
+window.addEventListener("storage", function (event) {
+    if (event.key !== "wiseliy_oauth_result" || !event.newValue) return;
+    let data;
+    try { data = JSON.parse(event.newValue); } catch { return; }
+    localStorage.removeItem("wiseliy_oauth_result");
+    handleOAuthResult(data);
+});
+
 // Message from the OAuth popup
 window.addEventListener("message", function (event) {
-    if (event.origin !== window.location.origin) return;
+    const expectedBackendOrigin =
+        "https://hrzv4tg1-7264.inc1.devtunnels.ms";
+
+    if (event.origin !== expectedBackendOrigin) return;
 
     if (event.data && event.data.type === "wiseliy-oauth") {
         if (event.data.success && event.data.connectionId) {
-            openDiscoveryModal(event.data.connectionId, event.data.clientId || currentClientId);
+            openDiscoveryModal(
+                event.data.connectionId,
+                event.data.clientId || currentClientId
+            );
         } else {
             loadAccounts();
             loadClientWorkspaces();

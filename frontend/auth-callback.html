@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signing you in | Wiseliy Social</title>
+    <title>Signing you in | Social Wise</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -100,7 +100,7 @@
         <h2 id="heading">Signing you in…</h2>
         <p id="subheading">Verifying your account and preparing your workspace.</p>
         <div class="error-box" id="errorBox"></div>
-        <a href="/login.html" class="btn-retry" id="retryBtn">Return to Login</a>
+        <a href="/login" class="btn-retry" id="retryBtn">Return to Login</a>
     </div>
 
     <script>
@@ -136,7 +136,7 @@
             }
 
             // Save token
-            localStorage.setItem('wiseliy_token', token);
+            sessionStorage.setItem('wiseliy_token', token);
 
             // Fetch user info from /api/social/auth/me using Bearer token
             const API_ORIGIN = window.location.protocol === "file:" ? "http://localhost:5293" : "";
@@ -153,10 +153,10 @@
 
                 const data = await res.json();
                 if (data.user) {
-                    localStorage.setItem('wiseliy_user', JSON.stringify(data.user));
+                    sessionStorage.setItem('wiseliy_user', JSON.stringify(data.user));
                 }
                 if (data.brands && data.brands.length > 0) {
-                    localStorage.setItem('wiseliy_client_id', String(data.brands[0].id));
+                    sessionStorage.setItem('wiseliy_client_id', String(data.brands[0].id));
                 }
 
                 heading.textContent = 'Welcome back!';

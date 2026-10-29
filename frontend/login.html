@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In – Wiseliy Social</title>
+    <title>Sign In – Social Wise</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -457,9 +457,14 @@ body{min-height:100vh;display:flex;flex-direction:column;align-items:center;just
 
         <!-- Logo + Smart sign-in pill -->
         <div class="panel-top">
-            <a class="brand-logo wiseliy-brand" href="index.html">
-                <span class="wiseliy-mark" aria-hidden="true"><i class="bi bi-share-fill"></i></span>
-                <span class="brand-word">WISELIY <span class="brand-product">SOCIAL</span></span>
+                        <a class="brand-logo wiseliy-brand" href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+                <div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:#fff; font-size:16px; box-shadow:0 3px 10px rgba(99,102,241,0.25);">
+                    <i class="bi bi-share-fill"></i>
+                </div>
+                <div style="display:flex; flex-direction:column; line-height:1.1;">
+                    <span style="font-size:16px; font-weight:800; letter-spacing:-0.2px; color:#1e1b4b;">Social Wise</span>
+                    <span style="font-size:9.5px; font-weight:700; letter-spacing:1px; color:#6b7280; text-transform:uppercase; margin-top:1px;">BY WISELIY</span>
+                </div>
             </a>
             <button class="smart-pill">
                 <span class="spark">✦</span>
@@ -469,7 +474,7 @@ body{min-height:100vh;display:flex;flex-direction:column;align-items:center;just
         </div>
 
         <div class="sign-title">Sign in</div>
-        <div class="sign-sub">to access <a href="#">Wiseliy Social</a></div>
+        <div class="sign-sub">to access <a href="#">Social Wise</a></div>
 
         <!-- Error -->
         <div class="error-box" id="loginError"></div>
@@ -480,51 +485,37 @@ body{min-height:100vh;display:flex;flex-direction:column;align-items:center;just
             <span id="emailShown"></span>
         </div>
 
-        <!-- Step 1: email -->
-        <div id="emailStep">
+        <!-- Direct Single-Step Standard Login Form -->
+        <form onsubmit="event.preventDefault(); submitLogin();">
             <div class="field">
                 <input type="email" id="loginEmail"
-                       placeholder="Email address or mobile number"
-                       onkeydown="if(event.key==='Enter') goNext()">
+                       placeholder="Email address" required autocomplete="username">
             </div>
-            <button class="btn-next" onclick="goNext()">Next</button>
 
-            <div class="social-label">Sign in using</div>
-            <div class="social-row">
-                <button class="soc-btn soc-google"   title="Google"   onclick="socialLogin('Google')">
-                    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                </button>
-                <button class="soc-btn soc-facebook" title="Facebook" onclick="socialLogin('Facebook')"><i class="bi bi-facebook"></i></button>
-                <button class="soc-btn soc-linkedin" title="LinkedIn" onclick="socialLogin('LinkedIn')"><i class="bi bi-linkedin"></i></button>
-                <button class="soc-btn soc-twitter"  title="X/Twitter" onclick="socialLogin('X')">
-                    <svg width="15" height="15" viewBox="0 0 1200 1227" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.163 519.284ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.828Z"/></svg>
-                </button>
-                <button class="soc-btn soc-apple"    title="Apple"    onclick="socialLogin('Apple')"><i class="bi bi-apple"></i></button>
-                <button class="soc-btn soc-ms" title="Microsoft" onclick="socialLogin('Microsoft')">
-                    <svg width="16" height="16" viewBox="0 0 21 21"><rect x="0" y="0" width="10" height="10" fill="#f25022"/><rect x="11" y="0" width="10" height="10" fill="#7fba00"/><rect x="0" y="11" width="10" height="10" fill="#00a4ef"/><rect x="11" y="11" width="10" height="10" fill="#ffb900"/></svg>
-                </button>
-                <button class="soc-btn soc-more" title="More">···</button>
-            </div>
-        </div>
-
-        <!-- Step 2: password -->
-        <div id="passwordStep" style="display:none;">
             <div class="field">
                 <div class="input-wrap">
                     <input type="password" id="loginPassword"
-                           placeholder="Enter your password"
-                           onkeydown="if(event.key==='Enter') submitLogin()">
+                           placeholder="Password" required autocomplete="current-password">
                     <button class="eye-btn" type="button" onclick="togglePw('loginPassword', this)">
                         <i class="bi bi-eye-slash"></i>
                     </button>
                 </div>
             </div>
-            <div class="forgot"><a href="#" onclick="return false">Forgot password?</a></div>
-            <button class="btn-next" id="loginBtn" onclick="submitLogin()">Sign in</button>
+
+            <button type="submit" class="btn-next" id="loginBtn">Sign in</button>
+        </form>
+
+        <div class="social-label">Or sign in using</div>
+        <div class="social-row">
+            <button class="soc-btn soc-google" type="button" title="Google" onclick="socialLogin('Google')">
+                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </button>
+            <button class="soc-btn soc-facebook" type="button" title="Facebook" onclick="socialLogin('Facebook')"><i class="bi bi-facebook"></i></button>
+            <button class="soc-btn soc-linkedin" type="button" title="LinkedIn" onclick="socialLogin('LinkedIn')"><i class="bi bi-linkedin"></i></button>
         </div>
 
         <div class="no-account">
-            Don't have a Wiseliy account? <a href="signup.html">Sign up now</a>
+            Don't have a Wiseliy account? <a href="/signup">Sign up now</a>
         </div>
 
     </div>
@@ -571,7 +562,7 @@ body{min-height:100vh;display:flex;flex-direction:column;align-items:center;just
     const API_ORIGIN = window.location.protocol === "file:" ? "http://localhost:5293" : "";
     const API_BASE   = `${API_ORIGIN}/api/social`;
 
-    if (localStorage.getItem('wiseliy_user')) window.location.replace('/');
+    if (sessionStorage.getItem('wiseliy_user')) { window.location.href = '/'; }
 
     function togglePw(id, btn) {
         const el = document.getElementById(id);
@@ -636,12 +627,12 @@ body{min-height:100vh;display:flex;flex-direction:column;align-items:center;just
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || data.title || 'Incorrect email or password.');
 
-            localStorage.setItem('wiseliy_user', JSON.stringify(data.user));
-            if (data.token) localStorage.setItem('wiseliy_token', data.token);
-            if (data.brands?.length) localStorage.setItem('wiseliy_client_id', String(data.brands[0].id));
+            sessionStorage.setItem('wiseliy_user', JSON.stringify(data.user));
+            if (data.token) sessionStorage.setItem('wiseliy_token', data.token);
+            if (data.brands?.length) sessionStorage.setItem('wiseliy_client_id', String(data.brands[0].id));
 
             toast(`Welcome back, ${data.user.fullName}!`);
-            setTimeout(() => window.location.href = '/', 1000);
+            setTimeout(() => window.location.href = '/', 800);
         } catch(err) {
             showError(err.message);
             btn.disabled = false; btn.textContent = 'Sign in';
